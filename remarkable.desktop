@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=Remarkable
+Comment=A free, fully featured markdown editor for Linux.
+Categories=GNOME;Utility;
+Exec=/usr/bin/remarkable %f
+Icon=/usr/share/remarkable/media/remarkable.svg
+Terminal=false
+Type=Application

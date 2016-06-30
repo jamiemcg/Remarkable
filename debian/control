@@ -1,0 +1,15 @@
+Package: remarkable
+Version: 1.75
+Architecture: all
+Maintainer: Jamie McGowan <jamiemcgowan.dev@gmail.com>
+Installed-Size: 388
+Depends: python3 | python, dconf-gsettings-backend | gsettings-backend, gir1.2-glib-2.0, gir1.2-gtk-3.0, python3-markdown, python3-bs4, gir1.2-webkit-3.0, yelp, wkhtmltopdf, python3-gi
+Section: python
+Priority: extra
+Description: A free fully featured markdown editor.
+ Remarkable is a free fully featured markdown editor. It has a syntax
+ like Github flavoured markdown. With it you can write markdown and view
+ the changes as you make them in the live preview window. You can export
+ your files to a variety of formats. There are multiple styles available
+ along with extensive configuration options so you can set it up exactly
+ how you like.

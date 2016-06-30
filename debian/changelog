@@ -1,0 +1,117 @@
+remarkable (1.75) xenial; urgency=medium
+
+	* Fixed startup error, partial local image support, bug fixes
+
+ -- Jamie McGowan <jamiemcgowan.dev@gmail.com>  Thu, 16 Jun 2016 21:10:40 +0100
+
+remarkable (1.62) vivid; urgency=medium
+
+	* Changes to reflect new website address [remarkableapp.github.io]
+
+ -- Jamie McGowan <jamiemcgowan.dev@gmail.com>  Mon, 29 Jun 2015 13:48:40 +0100
+
+remarkable (1.61) vivid; urgency=medium
+
+	* Major Fixes, significant performance improvement, fixed scrolling bug, misc fixes
+
+ -- Jamie McGowan <jamiemcgowan.dev@gmail.com>  Mon, 29 Jun 2015 13:48:40 +0100
+
+remarkable (1.41) utopic; urgency=medium
+
+	* Major Fixes, fixed PDF failures, fixed python-markdown errors, misc fixes
+
+ -- Jamie McGowan <jamiemcgowan.dev@gmail.com>  Sun, 19 Apr 2015 13:48:40 +0100
+
+remarkable (1.25) utopic; urgency=medium
+
+	* Added font selection dialog, TOC support,
+	now converts special characters to their special HTML codes
+
+ -- Jamie McGowan <jamiemcgowan.dev@gmail.com>  Fri, 6 Feb 2015 22:42:40 +0100
+
+remarkable (1.025) utopic; urgency=medium
+
+	* Major fixes, disabled most notify-send, mathjax support (initial),
+	 export without css. preview externally
+
+ -- Jamie McGowan <jamiemcgowan.dev@gmail.com>  Tue, 4 Feb 2015 20:12:40 +0100
+
+remarkable (0.975) utopic; urgency=medium
+
+	*Minor bug fixes, Added actions (convert to title, upper, lower case), 
+	 Add copy to HTML (all and selection to clipboard), improved styles
+
+ -- Jamie McGowan <jamiemcgowan.dev@gmail.com>  Wed, 13 Aug 2014 21:12:40 +0100
+
+remarkable (0.965) trusty; urgency=medium
+
+	*Many minor bug fixes, Improved PDF export
+
+ -- Jamie McGowan <jamiemcgowan.dev@gmail.com>  Wed, 13 Aug 2014 21:12:40 +0100
+
+remarkable (0.955) trusty; urgency=medium
+
+	*Major bug fix regarding pdf export
+	  Major bug fix regarding html export
+
+ -- Jamie McGowan <jamiemcgowan.dev@gmail.com>  Wed, 13 Aug 2014 21:12:40 +0100
+
+remarkable (0.950) trusty; urgency=medium
+
+	* Added styles
+	  Updated styles
+	  Minor bug fixes
+	  Dark mode fix
+
+ -- Jamie McGowan <jamiemcgowan.dev@gmail.com>  Wed, 06 Aug 2014 21:02:40 +0100
+
+remarkable (0.900) trusty; urgency=medium
+
+	*  Entire application rewritten to Python 3
+	  Fixed issue with accents. Now fully accepts accents and symbols.
+	 Markdown support greatly improved thanks to python-markdown extensions (default extra version)
+	 Highlighting is now possible. ==text== becomes <mark>text</mark>
+	 Simpler link syntax with URL auto-linking like Github Flavoured Markdown
+	 Exported .pdf files will have a table of contents (using the headers)
+	 Stikethrough is now possible. Like GFM, ~~mistake~~ becomes <del>mistake</del>
+	 Superscript is now enabled. The syntax is like so X^2^ + Y^2^ = Z^2^.
+	 Subscript is now enabled. The syntax is like so H~2~O. 
+	 Better new line support
+	Check boxes are now implemented
+	Fenced and in-line code-blocks are now possible. Just wrap the code with three 
+	ticks on both sides of the code
+	Additional options for _italic_, __bold__ and ___both___.
+	Added a file association so the system knows that remarkable can open files when supplied arguments
+	Tables are now supported using syntax similar to Github. You can even use markdown within the table!
+
+ -- Jamie McGowan <jamiemcgowan.dev@gmail.com>  Wed, 07 Aug 2014 23:13:40 +0100
+
+remarkable (0.875) trusty; urgency=medium
+
+	* Can now supply arguments to the command line to open/edit files.
+	 Enabled spell checking in editor view (via gtkspellchecker)
+
+ -- Jamie McGowan <jamiemcgowan.dev@gmail.com>  Wed, 06 Aug 2014 21:02:40 +0100
+
+remarkable (0.85) trusty; urgency=medium
+
+  [ Jamie McGowan ]
+  * 
+
+  [ root ]
+
+  [ Jamie McGowan ]
+
+ -- Jamie McGowan <jamiemcgowan.dev@gmail.com>  Mon, 04 Aug 2014 20:01:06 +0100
+
+remarkable (0.80) trusty; urgency=medium
+
+  * 
+
+ -- Jamie McGowan <jamiemcgowan.dev@gmail.com>  Sat, 02 Aug 2014 22:00:38 +0100
+
+remarkable (0.7) trusty; urgency=medium
+
+
+ -- Jamie McGowan <jamiemcgowan.dev@gmail.com>  Sat, 19 Jul 2014 16:57:24 +0100
+
