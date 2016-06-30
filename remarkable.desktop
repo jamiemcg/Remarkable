@@ -3,6 +3,6 @@ Name=Remarkable
 Comment=A free, fully featured markdown editor for Linux.
 Categories=GNOME;Utility;
 Exec=/usr/bin/remarkable %f
-Icon=/usr/share/remarkable/media/remarkable.svg
+Icon=remarkable
 Terminal=false
 Type=Application
