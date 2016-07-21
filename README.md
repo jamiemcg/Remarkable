@@ -2,9 +2,9 @@
 
 ###A Fully Featured Markdown Editor for Linux
 
-Remarkable is an open source Markdown Editor for Linux. It is released under the MIT license.
+Remarkable is an open source Markdown Editor for Linux.
 You can download the latest version from the [project site](https://remarkableapp.github.io/linux.html).
-It is also available on the [AUR](https://aur.archlinux.org/packages/remarkable/).
+It is also available on the [AUR](https://aur.archlinux.org/packages/remarkable/). It has already been downloaded more than 35,000 times!
 
 ![Remarkable Screenshot](http://remarkableapp.github.io/images/alice.png)
 
@@ -26,5 +26,14 @@ Check out the [homepage](https://remarkableapp.github.io/linux.html) for more de
 
 Feel free to report any bugs or make suggestions [here](https://github.com/jamiemcg/Remarkable/issues)
 
-###Donations/Tips
-If you like Remarkable and wish to support futher development you can [make a donation here](https://remarkableapp.github.io/linux/donate.html) :coffee: :beer: :smile:
+###Donations/Tips :coffee: :beer: :smile:
+If you like Remarkable and wish to support futher development you can make a donation using the links below or [else from here](https://remarkableapp.github.io/linux/donate.html)
+
+####Paypal
+[![PayPay Remarkable](http://i.imgur.com/nobGgBf.png)](https://www.paypal.com/ie/cgi-bin/webscr?cmd=_flow&SESSION=jINvs5iUZvpYVIi31G5ifaJ-81dTj8QCfJL6S6zChQe8nSM314Z6dbMZa1K&dispatch=5885d80a13c0db1f8e263663d3faee8d64813b57e559a2578463e58274899069)
+####Bitcoin
+![Bitcoin Remarkable](http://remarkableapp.github.io/images/QR%20wallet.png)
+
+
+Address: 17BTowSjuartEEgeta3RuHYxeJW1aeXxCv
+
