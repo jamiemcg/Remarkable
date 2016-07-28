@@ -30,7 +30,7 @@ Feel free to report any bugs or make suggestions [here](https://github.com/jamie
 If you like Remarkable and wish to support futher development you can make a donation using the links below or [else from here](https://remarkableapp.github.io/linux/donate.html)
 
 ####[Paypal](https://www.paypal.com/ie/cgi-bin/webscr?cmd=_flow&SESSION=jINvs5iUZvpYVIi31G5ifaJ-81dTj8QCfJL6S6zChQe8nSM314Z6dbMZa1K&dispatch=5885d80a13c0db1f8e263663d3faee8d64813b57e559a2578463e58274899069)
-[![PayPay Remarkable](http://i.imgur.com/nobGgBf.png)](https://www.paypal.com/ie/cgi-bin/webscr?cmd=_flow&SESSION=jINvs5iUZvpYVIi31G5ifaJ-81dTj8QCfJL6S6zChQe8nSM314Z6dbMZa1K&dispatch=5885d80a13c0db1f8e263663d3faee8d64813b57e559a2578463e58274899069)
+[![PayPay Remarkable](http://i.imgur.com/nobGgBf.png)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=B5PJTSJNFYGT2)
 ####Bitcoin
 ![Bitcoin Remarkable](http://remarkableapp.github.io/images/QR%20wallet.png)
 
