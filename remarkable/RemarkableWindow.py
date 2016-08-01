@@ -41,6 +41,7 @@ import traceback
 import styles, undobuffer
 import unicodedata
 import warnings
+import datetime
 
 
 #Check if gtkspellcheck is installed
@@ -596,10 +597,32 @@ class RemarkableWindow(Window):
 
     def on_menuitem_paste_activate(self, widget):
         text = self.clipboard.wait_for_text()
+        image = self.clipboard.wait_for_image()
         if text != None:
             if self.text_buffer.get_has_selection():
                 start, end = self.text_buffer.get_selection_bounds()
                 self.text_buffer.delete(start, end)
+            self.text_buffer.insert_at_cursor(text)
+        elif image != None:
+            image_rel_path = 'imgs'
+            if self.name == 'Untitled':
+                # File not yet saved (i.e. we do not have path for the file)
+                self.save(widget)
+                assert self.name != 'Untitled'
+
+            image_dir = os.path.join(os.path.dirname(self.name), image_rel_path)
+            image_fname = datetime.datetime.now().strftime('%Y%m%d-%H%M%S.png')
+            image_path = os.path.join(image_dir, image_fname)
+            text = '![](%s/%s)' % (image_rel_path, image_fname)
+
+            if not os.path.exists(image_dir):
+                os.makedirs(image_dir)
+            image.savev(image_path, 'png', [], [])
+
+            if self.text_buffer.get_has_selection():
+                start, end = self.text_buffer.get_selection_bounds()
+                self.text_buffer.delete(start, end)
+
             self.text_buffer.insert_at_cursor(text)
 
     def on_menuitem_lower_activate(self, widget):
