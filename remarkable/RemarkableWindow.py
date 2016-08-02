@@ -1095,6 +1095,13 @@ class RemarkableWindow(Window):
         vbox.pack_start(self.entry_url, self, False, False)
         button = Gtk.Button("Insert Link")
         vbox.pack_end(button, self, False, False)
+
+        # Use highligted text as the default "alt text"
+        if self.text_buffer.get_has_selection():
+            start, end = self.text_buffer.get_selection_bounds()
+            text = self.text_buffer.get_text(start, end, True)
+            self.entry_alt_text.set_text(text)
+
         self.insert_window_link.add(vbox)
         self.insert_window_link.show_all()
         button.connect("clicked", self.insert_link_cmd, self.insert_window_link)
@@ -1102,6 +1109,10 @@ class RemarkableWindow(Window):
     def insert_link_cmd(self, widget, window):
         if self.entry_url.get_text():
             link = "[" + self.entry_alt_text.get_text() + "](" + self.entry_url.get_text() + ") "
+            # Delete highlighted text before inserting the link
+            if self.text_buffer.get_has_selection():
+                start, end = self.text_buffer.get_selection_bounds()
+                self.text_buffer.delete(start, end)
             self.text_buffer.insert_at_cursor(link)
         else:
             pass
