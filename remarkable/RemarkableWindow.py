@@ -304,16 +304,11 @@ class RemarkableWindow(Window):
     def on_toolbutton_new_clicked(self, widget):
         self.new(self)
 
+    """
+        Launches a new instance of Remarkable
+    """
     def new(self, widget):
-        if self.check_for_save(None):
-            self.save(self)
-        else:
-            start, end = self.text_buffer.get_bounds()
-            self.text_buffer.delete(start, end)
-
-        self.name = "Untitled"
-        self.text_buffer.set_modified(False)
-        self.window.set_title("Remarkable")
+        subprocess.Popen("remarkable")
 
     def on_menuitem_open_activate(self, widget):
         self.open(self)
@@ -321,27 +316,40 @@ class RemarkableWindow(Window):
     def on_toolbutton_open_clicked(self, widget):
         self.open(self)
 
+    """
+        Opens a file for editing / viewing
+    """
     def open(self, widget):
         start, end = self.text_buffer.get_bounds()
         text = self.text_buffer.get_text(start, end, False)
-        if len(text) > 0:
-            if self.check_for_save(None):
-                self.save(self)
+        
         self.window.set_sensitive(False)
         chooser = Gtk.FileChooserDialog(title="Open File", action=Gtk.FileChooserAction.OPEN, buttons=(
             Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OPEN, Gtk.ResponseType.OK))
         response = chooser.run()
+
         if response == Gtk.ResponseType.OK:
-            file = open(chooser.get_filename(), 'r')
-            text = file.read()
-            file.close()
-            self.name = chooser.get_filename()
-            self.text_buffer.set_text(text)
-            title = chooser.get_filename().split("/")[-1]
-            self.window.set_title("Remarkable: " + title)
-            self.text_buffer.set_modified(False)
+            # The user has selected a file
+            selected_file = chooser.get_filename()
+            
+            if len(text) == 0 and not self.text_buffer.get_modified():
+                # Current file is empty. Load contents of selected file into this view
+                file = open(selected_file, 'r')
+                text = file.read()
+                file.close()
+                self.name = chooser.get_filename()
+                self.text_buffer.set_text(text)
+                title = chooser.get_filename().split("/")[-1]
+                self.window.set_title("Remarkable: " + title)
+                self.text_buffer.set_modified(False)
+            else:
+                # A file is already open. Load the selected file in a new Remarkable process
+                subprocess.Popen(["remarkable", selected_file])
+        
         elif response == Gtk.ResponseType.CANCEL:
+            # The user has clicked cancel
             pass
+
         chooser.destroy()
         self.window.set_sensitive(True)
 
