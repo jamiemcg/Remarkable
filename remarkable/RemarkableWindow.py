@@ -41,6 +41,7 @@ import traceback
 import styles, undobuffer
 import unicodedata
 import warnings
+import datetime
 
 
 #Check if gtkspellcheck is installed
@@ -596,10 +597,32 @@ class RemarkableWindow(Window):
 
     def on_menuitem_paste_activate(self, widget):
         text = self.clipboard.wait_for_text()
+        image = self.clipboard.wait_for_image()
         if text != None:
             if self.text_buffer.get_has_selection():
                 start, end = self.text_buffer.get_selection_bounds()
                 self.text_buffer.delete(start, end)
+            self.text_buffer.insert_at_cursor(text)
+        elif image != None:
+            image_rel_path = 'imgs'
+            if self.name == 'Untitled':
+                # File not yet saved (i.e. we do not have path for the file)
+                self.save(widget)
+                assert self.name != 'Untitled'
+
+            image_dir = os.path.join(os.path.dirname(self.name), image_rel_path)
+            image_fname = datetime.datetime.now().strftime('%Y%m%d-%H%M%S.png')
+            image_path = os.path.join(image_dir, image_fname)
+            text = '![](%s/%s)' % (image_rel_path, image_fname)
+
+            if not os.path.exists(image_dir):
+                os.makedirs(image_dir)
+            image.savev(image_path, 'png', [], [])
+
+            if self.text_buffer.get_has_selection():
+                start, end = self.text_buffer.get_selection_bounds()
+                self.text_buffer.delete(start, end)
+
             self.text_buffer.insert_at_cursor(text)
 
     def on_menuitem_lower_activate(self, widget):
@@ -1072,6 +1095,13 @@ class RemarkableWindow(Window):
         vbox.pack_start(self.entry_url, self, False, False)
         button = Gtk.Button("Insert Link")
         vbox.pack_end(button, self, False, False)
+
+        # Use highligted text as the default "alt text"
+        if self.text_buffer.get_has_selection():
+            start, end = self.text_buffer.get_selection_bounds()
+            text = self.text_buffer.get_text(start, end, True)
+            self.entry_alt_text.set_text(text)
+
         self.insert_window_link.add(vbox)
         self.insert_window_link.show_all()
         button.connect("clicked", self.insert_link_cmd, self.insert_window_link)
@@ -1079,6 +1109,10 @@ class RemarkableWindow(Window):
     def insert_link_cmd(self, widget, window):
         if self.entry_url.get_text():
             link = "[" + self.entry_alt_text.get_text() + "](" + self.entry_url.get_text() + ") "
+            # Delete highlighted text before inserting the link
+            if self.text_buffer.get_has_selection():
+                start, end = self.text_buffer.get_selection_bounds()
+                self.text_buffer.delete(start, end)
             self.text_buffer.insert_at_cursor(link)
         else:
             pass
