@@ -1,7 +1,7 @@
 #!usr/bin/python3
 # -*- Mode: Python; coding: utf-8; indent-tabs-mode: nil; tab-width: 4 -*-
 ### BEGIN LICENSE
-# Copyright (C) 2015 <Jamie McGowan> <jamiemcgowan.dev@gmail.com>
+# Copyright (C) 2016 <Jamie McGowan> <jamiemcgowan.dev@gmail.com>
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
 # in the Software without restriction, including without limitation the rights
@@ -23,13 +23,11 @@
 
 import gi
 gi.require_version('Gtk', '3.0')
-gi.require_version("WebKit", '3.0')
+gi.require_version('GtkSource', '3.0')
+gi.require_version('WebKit', '3.0')
 
 from bs4 import BeautifulSoup
-from gi.repository import Gtk # pylint: disable=E0611
-from gi.repository import Gdk
-from gi.repository import Pango
-from gi.repository import WebKit
+from gi.repository import Gdk, Gtk, GtkSource, Pango, WebKit
 from locale import gettext as _
 from urllib.request import urlopen
 import markdown
@@ -38,7 +36,7 @@ import pdfkit
 import re, subprocess, datetime, os, webbrowser, _thread, sys, locale
 import tempfile
 import traceback
-import styles, undobuffer
+import styles
 import unicodedata
 import warnings
 import datetime
@@ -99,9 +97,20 @@ class RemarkableWindow(Window):
         self.window.connect("delete-event", self.window_delete_event)
         self.window.connect("destroy", self.quit_requested)
 
-        self.text_view = Gtk.TextView()
-        self.text_buffer = undobuffer.UndoableBuffer()
-        self.text_buffer.connect("changed",self.on_text_view_changed)
+        self.text_view = GtkSource.View()
+        self.text_view.set_show_line_numbers(True)
+        self.text_view.set_auto_indent(True)
+        
+        self.lang_manager = GtkSource.LanguageManager()
+        self.text_buffer = self.text_view.get_buffer()
+        self.text_buffer.set_language(self.lang_manager.get_language('markdown'))
+        self.text_buffer.set_highlight_matching_brackets(True)
+        
+        self.undo_manager = self.text_buffer.get_undo_manager()
+        self.undo_manager.connect("can-undo-changed", self.can_undo_changed)
+        self.undo_manager.connect("can-redo-changed", self.can_redo_changed)
+
+        self.text_buffer.connect("changed", self.on_text_view_changed)
         self.text_view.set_buffer(self.text_buffer)
         self.text_view.set_wrap_mode(Gtk.WrapMode.WORD)
 
@@ -167,19 +176,38 @@ class RemarkableWindow(Window):
 
         self.temp_file_list = []
 
+    def can_redo_changed(self, widget):
+        if self.text_buffer.can_redo():
+            self.builder.get_object("menuitem_redo").set_sensitive(True)
+            self.builder.get_object("toolbutton_redo").set_sensitive(True)
+        else:
+            self.builder.get_object("menuitem_redo").set_sensitive(False)
+            self.builder.get_object("toolbutton_redo").set_sensitive(False)
+
+    def can_undo_changed(self, widget):
+        if self.text_buffer.can_undo():
+            self.builder.get_object("menuitem_undo").set_sensitive(True)
+            self.builder.get_object("toolbutton_undo").set_sensitive(True)
+
+        else:
+            self.builder.get_object("menuitem_undo").set_sensitive(False)
+            self.builder.get_object("toolbutton_undo").set_sensitive(False)
+
     def check_settings(self):
         if not os.path.exists(self.path):
             os.makedirs(self.path)
         if not os.path.isfile(self.settings_path):
             self.remarkable_settings = {}
-            self.remarkable_settings['live-preview'] = True
-            self.remarkable_settings['word-wrap'] = True        
-            self.remarkable_settings['toolbar'] = True
-            self.remarkable_settings['statusbar'] = True
-            self.remarkable_settings['nightmode'] = False       
             self.remarkable_settings['css'] = '' 
             self.remarkable_settings['font'] = "Sans 10"  
-            self.remarkable_settings['style'] = "github"             
+            self.remarkable_settings['line-numbers'] = True
+            self.remarkable_settings['live-preview'] = True
+            self.remarkable_settings['nightmode'] = False       
+            self.remarkable_settings['statusbar'] = True
+            self.remarkable_settings['style'] = "github"
+            self.remarkable_settings['toolbar'] = True
+            self.remarkable_settings['vertical'] = False
+            self.remarkable_settings['word-wrap'] = True                    
             settings_file = open(self.settings_path, 'w')
             settings_file.write(str(self.remarkable_settings))
             settings_file.close()
@@ -198,36 +226,50 @@ class RemarkableWindow(Window):
         self.custom_css = self.remarkable_settings['css'] #Load the custom css (don't auto enable)
 
         if self.remarkable_settings['nightmode']:
-            #Enable night/dark mode on startup
+            # Enable night/dark mode on startup
             self.builder.get_object("menuitem_night_mode").set_active(True)
             self.on_menuitem_night_mode_activate(self)
 
         if self.remarkable_settings['word-wrap'] == False:
-            #Disable word wrap on startup
+            # Disable word wrap on startup
             self.builder.get_object("menuitem_word_wrap").set_active(False)
             self.on_menuitem_word_wrap_activate(self)
 
         if self.remarkable_settings['live-preview'] == False:
-            #Disable Live Preview on startup
+            # Disable Live Preview on startup
             self.builder.get_object("menuitem_live_preview").set_active(False)
 
         if self.remarkable_settings['toolbar'] == False:
-            #Hide the toolbar on startup
+            # Hide the toolbar on startup
             self.on_menuitem_toolbar_activate(self)
 
         if self.remarkable_settings['statusbar'] == False:
-            #Hide the statusbar on startup
+            # Hide the statusbar on startup
             self.on_menuitem_statusbar_activate(self)
+        
+        # New settings, create them with default if they don't exist
+        if "line-numbers" not in self.remarkable_settings:
+            self.remarkable_settings['line-numbers'] = True
+                
+        if self.remarkable_settings['line-numbers'] == False:
+            # Hide line numbers on startup
+            self.builder.get_object("menuitem_line_numbers").set_active(False)
 
-        #Try to load the previously chosen font, may fail as font may not exist, ect.
+        if "vertical" not in self.remarkable_settings:
+            self.remarkable_settings['vertical'] = False
+            
+        if self.remarkable_settings['vertical'] == True:
+            # Switch to vertical layout
+            self.builder.get_object("menuitem_vertical_layout").set_active(True)
+
+        # Try to load the previously chosen font, may fail as font may not exist, ect.
         try:
             self.font = self.remarkable_settings['font']
             self.text_view.override_font(Pango.FontDescription(self.font))
         except:
-            pass #Loading font failed --> leave at default font
+            pass # Loading font failed --> leave at default font
             
-        #Try to load the previously chosen style, may fail
-        #so ignore if this is the case
+        # Try to load the previously chosen style. May fail if so, ignore
         try:
             self.style = self.remarkable_settings['style']
             if self.style == "dark":
@@ -334,6 +376,8 @@ class RemarkableWindow(Window):
             
             if len(text) == 0 and not self.text_buffer.get_modified():
                 # Current file is empty. Load contents of selected file into this view
+                
+                self.text_buffer.begin_not_undoable_action()
                 file = open(selected_file, 'r')
                 text = file.read()
                 file.close()
@@ -342,6 +386,7 @@ class RemarkableWindow(Window):
                 title = chooser.get_filename().split("/")[-1]
                 self.window.set_title("Remarkable: " + title)
                 self.text_buffer.set_modified(False)
+                self.text_buffer.end_not_undoable_action()
             else:
                 # A file is already open. Load the selected file in a new Remarkable process
                 subprocess.Popen(["remarkable", selected_file])
@@ -429,7 +474,7 @@ class RemarkableWindow(Window):
         self.save_html(html)
 
     def on_menuitem_export_html_plain_activate(self, widget):
-        #This can be re-factored
+        # This can be re-factored. A lot of duplicated code. Migrate some functions to external .py files
         self.window.set_sensitive(False)
         start, end = self.text_buffer.get_bounds()
         text = self.text_buffer.get_text(start, end, False)
@@ -559,7 +604,7 @@ class RemarkableWindow(Window):
         self.quit_requested(None)
 
     def quit_requested(self, widget, callback_data=None):
-        self.clean_up() #Second time, just to be safe
+        self.clean_up() # Second time, just to be safe
         Gtk.main_quit()
 
     def on_menuitem_undo_activate(self, widget):
@@ -569,7 +614,7 @@ class RemarkableWindow(Window):
         self.undo(self)
 
     def undo(self, widget):
-        if self.text_buffer.can_undo:
+        if self.text_buffer.can_undo():
             self.text_buffer.undo()
 
     def on_menuitem_redo_activate(self, widget):
@@ -587,7 +632,7 @@ class RemarkableWindow(Window):
         self.scrollPreviewToFix(self)
 
     def redo(self, widget):
-        if self.text_buffer.can_redo:
+        if self.text_buffer.can_redo():
             self.text_buffer.redo()
 
     def on_menuitem_cut_activate(self, widget):
@@ -656,9 +701,33 @@ class RemarkableWindow(Window):
             text = text.upper()
             self.text_buffer.delete(start, end)
             self.text_buffer.insert_at_cursor(text)
+            
+    def on_menuitem_join_lines_activate(self, widget):
+        if self.text_buffer.get_has_selection():
+            start, end = self.text_buffer.get_selection_bounds()
+            self.text_buffer.join_lines(start, end)
+        
+    def on_menuitem_sort_lines_activate(self, widget):
+        if self.text_buffer.get_has_selection():
+            # Sort the selected lines
+            start, end = self.text_buffer.get_selection_bounds()
+            self.text_buffer.sort_lines(start, end, GtkSource.SortFlags.CASE_SENSITIVE, 0)
+        else:
+            # No selection active, sort all lines
+            start, end = self.text_buffer.get_bounds()
+            self.text_buffer.sort_lines(start, end, GtkSource.SortFlags.CASE_SENSITIVE, 0)
+
+    def on_menuitem_sort_lines_reverse_activate(self, widget):
+        if self.text_buffer.get_has_selection():
+            # Sort the selected lines in reverse
+            start, end = self.text_buffer.get_selection_bounds()
+            self.text_buffer.sort_lines(start, end, GtkSource.SortFlags.REVERSE_ORDER, 0)
+        else:
+            # No selection active, sort all lines in reverse
+            start, end = self.text_buffer.get_bounds()
+            self.text_buffer.sort_lines(start, end, GtkSource.SortFlags.REVERSE_ORDER, 0)
 
     def on_menuitem_copy_all_activate(self, widget):
-        #Select the text
         text = self.text_buffer.get_text(self.text_buffer.get_start_iter(), self.text_buffer.get_end_iter(), False)
         try:
             text = markdown.markdown(text, self.default_extensions)
@@ -682,6 +751,20 @@ class RemarkableWindow(Window):
                     html_middle = markdown.markdown(text)
             self.clipboard.set_text(text, -1)
 
+    def on_menuitem_vertical_layout_activate(self, widget):
+        if self.builder.get_object("menuitem_vertical_layout").get_active():
+            # Switch to vertical layout and need to reset position
+            self.paned.set_orientation(Gtk.Orientation.VERTICAL)
+            self.paned.set_orientation(Gtk.Orientation.HORIZONTAL)
+            self.paned.set_orientation(Gtk.Orientation.VERTICAL)
+            self.paned.set_position(self.paned.get_allocation().height/2) 
+            self.remarkable_settings['vertical'] = True
+        else:   
+            self.paned.set_orientation(Gtk.Orientation.HORIZONTAL)
+            self.paned.set_position(self.paned.get_allocation().width/2)
+            self.remarkable_settings['vertical'] = False
+        self.write_settings()
+
     def on_menuitem_word_wrap_activate(self, widget):
         if self.builder.get_object("menuitem_word_wrap").get_active():
             self.text_view.set_wrap_mode(Gtk.WrapMode.WORD)
@@ -691,19 +774,30 @@ class RemarkableWindow(Window):
             self.remarkable_settings['word-wrap'] = False   
         self.write_settings()
 
+
+    def on_menuitem_line_numbers_activate(self, widget):
+        if self.builder.get_object("menuitem_line_numbers").get_active():
+            self.text_view.set_show_line_numbers(True)
+            self.remarkable_settings['line-numbers'] = True
+        else:
+            self.text_view.set_show_line_numbers(False)
+            self.remarkable_settings['line-numbers'] = False
+        self.write_settings()
+
+
     def on_menuitem_live_preview_activate(self, widget):
         self.toggle_live_preview(self)
 
     def toggle_live_preview(self, widget):
         if self.live_preview.get_visible():
-                #hide the live preview
+                # Hide the live preview
                 self.paned.remove(self.scrolledwindow_live_preview)
                 self.live_preview.set_visible(False)
                 self.builder.get_object("menuitem_swap").set_sensitive(False)
                 self.builder.get_object("menuitem_swap").set_tooltip_text("Enable Live Preview First")
                 self.builder.get_object("toolbar1").set_visible(False)
                 self.remarkable_settings['live-preview'] = False
-        else:  # is hidden, thus show
+        else:  # Show the live preview
             if self.editor_position == 0:
                 self.paned.add(self.scrolledwindow_live_preview)
             else:
@@ -732,7 +826,7 @@ class RemarkableWindow(Window):
                 self.paned.add(self.scrolledwindow_live_preview)
                 self.editor_position = 0
         else:
-            pass # do nothing as live preview is not visible
+            pass # Do nothing as live preview is not visible
 
     def on_menuitem_editor_font_activate(self, widget):
         self.font_chooser = Gtk.FontSelectionDialog()
@@ -740,7 +834,7 @@ class RemarkableWindow(Window):
         try:
             self.font_chooser.set_font_name(self.font)
         except:
-            pass #Font not initialized, do nothing, continue
+            pass # Font not initialized, do nothing, continue
         self.font_chooser.connect("destroy", self.font_dialog_destroyed)
         self.font_ok_button = self.font_chooser.get_ok_button()
         self.font_ok_button.connect("clicked", self.font_dialog_ok)
@@ -756,12 +850,11 @@ class RemarkableWindow(Window):
 
     def font_dialog_ok(self, widget):
         self.font = self.font_chooser.get_font_name()
-        self.remarkable_settings['font'] = self.font #Save prefs
+        self.remarkable_settings['font'] = self.font # Save prefs
         self.write_settings()    
         self.text_view.override_font(Pango.FontDescription(self.font))
 
-        #Now adjust the size using TextTag
-
+        # Now adjust the size using TextTag
         self.font_dialog_destroyed(self)
 
     def on_menuitem_statusbar_activate(self, widget):
@@ -782,7 +875,7 @@ class RemarkableWindow(Window):
             self.builder.get_object("menuitem_toolbar").set_label("Show Toolbar")
             self.builder.get_object("toolbar1").set_visible(False)
             self.remarkable_settings['toolbar'] = False
-            
+
         else:
             self.toolbar.set_visible(True)
             self.builder.get_object("menuitem_toolbar").set_label("Hide Toolbar")
@@ -791,7 +884,7 @@ class RemarkableWindow(Window):
         self.write_settings()
 
     def on_menuitem_preview_browser_activate(self, widget):
-        #Create a temporary HTML file
+        # Create a temporary HTML file
         tf = tempfile.NamedTemporaryFile(delete = False)
         self.temp_file_list.append(tf)
         tf_name = tf.name
@@ -807,9 +900,9 @@ class RemarkableWindow(Window):
         html = self.default_html_start + html_middle + self.default_html_end
         tf.write(html.encode())
         tf.flush()
-        webbrowser.open_new_tab(tf_name)
 
-        #Load it in the default web browser
+        # Load the temporary HTML file in the user's default browser
+        webbrowser.open_new_tab(tf_name)
 
     def on_menuitem_night_mode_activate(self, widget):
         if self.builder.get_object("menuitem_night_mode").get_active():
@@ -837,12 +930,12 @@ class RemarkableWindow(Window):
         self.bold(self)
 
     def bold(self, widget):
-        if not self.text_buffer.get_has_selection():  # nothing has been selected, add **** and place cursor in middle
+        if not self.text_buffer.get_has_selection():  # Nothing has been selected, add **** and place cursor in middle
             self.text_buffer.insert_at_cursor("****")
             loc = self.text_buffer.get_iter_at_mark(self.text_buffer.get_insert())
             loc.backward_chars(2)
             self.text_buffer.place_cursor(loc)
-        else:  # turn selection bold
+        else:  # Turn selection bold
             selection_bounds = self.text_buffer.get_selection_bounds()
             mark1 = self.text_buffer.create_mark(None, selection_bounds[0], False)
             mark2 = self.text_buffer.create_mark(None, selection_bounds[1], False)
@@ -856,12 +949,12 @@ class RemarkableWindow(Window):
         self.italic(self)
 
     def italic(self, widget):
-        if not self.text_buffer.get_has_selection():  # nothing has been selected, add ** and place cursor in middle
+        if not self.text_buffer.get_has_selection():  # Nothing has been selected, add ** and place cursor in middle
             self.text_buffer.insert_at_cursor("**")
             loc = self.text_buffer.get_iter_at_mark(self.text_buffer.get_insert())
             loc.backward_chars(1)
             self.text_buffer.place_cursor(loc)
-        else:  # turn selection italic
+        else:  # Turn selection italic
             selection_bounds = self.text_buffer.get_selection_bounds()
             mark1 = self.text_buffer.create_mark(None, selection_bounds[0], False)
             mark2 = self.text_buffer.create_mark(None, selection_bounds[1], False)
@@ -875,12 +968,12 @@ class RemarkableWindow(Window):
         self.strikethrough(self)
 
     def strikethrough(self, widget):
-        if not self.text_buffer.get_has_selection():  # nothing has been selected, add **** and place cursor in middle
+        if not self.text_buffer.get_has_selection():  # Nothing has been selected, add **** and place cursor in middle
             self.text_buffer.insert_at_cursor("~~~~")
             loc = self.text_buffer.get_iter_at_mark(self.text_buffer.get_insert())
             loc.backward_chars(2)
             self.text_buffer.place_cursor(loc)
-        else:  # strikethrough selection
+        else:  # Strikethrough selection
             selection_bounds = self.text_buffer.get_selection_bounds()
             mark1 = self.text_buffer.create_mark(None, selection_bounds[0], False)
             mark2 = self.text_buffer.create_mark(None, selection_bounds[1], False)
@@ -888,12 +981,12 @@ class RemarkableWindow(Window):
             self.text_buffer.insert(self.text_buffer.get_iter_at_mark(mark2), "~~")
 
     def on_menuitem_highlight_activate(self, widget):
-        if not self.text_buffer.get_has_selection():  # nothing has been selected, add ==== and place cursor in middle
+        if not self.text_buffer.get_has_selection():  # Nothing has been selected, add ==== and place cursor in middle
             self.text_buffer.insert_at_cursor("====")
             loc = self.text_buffer.get_iter_at_mark(self.text_buffer.get_insert())
             loc.backward_chars(2)
             self.text_buffer.place_cursor(loc)
-        else:  # highlight the selected text
+        else:  # Highlight the selected text
             selection_bounds = self.text_buffer.get_selection_bounds()
             mark1 = self.text_buffer.create_mark(None, selection_bounds[0], False)
             mark2 = self.text_buffer.create_mark(None, selection_bounds[1], False)
@@ -901,12 +994,12 @@ class RemarkableWindow(Window):
             self.text_buffer.insert(self.text_buffer.get_iter_at_mark(mark2), "==")
 
     def on_menuitem_superscript_activate(self, widget):
-        if not self.text_buffer.get_has_selection():  # nothing has been selected, add ^^ and place cursor in middle
+        if not self.text_buffer.get_has_selection():  # Nothing has been selected, add ^^ and place cursor in middle
             self.text_buffer.insert_at_cursor("^^")
             loc = self.text_buffer.get_iter_at_mark(self.text_buffer.get_insert())
             loc.backward_chars(1)
             self.text_buffer.place_cursor(loc)
-        else:  # convert selection to superscript
+        else:  # Convert selection to superscript
             selection_bounds = self.text_buffer.get_selection_bounds()
             mark1 = self.text_buffer.create_mark(None, selection_bounds[0], False)
             mark2 = self.text_buffer.create_mark(None, selection_bounds[1], False)
@@ -914,12 +1007,12 @@ class RemarkableWindow(Window):
             self.text_buffer.insert(self.text_buffer.get_iter_at_mark(mark2), "^")
 
     def on_menuitem_subscript_activate(self, widget):
-        if not self.text_buffer.get_has_selection():  # nothing has been selected, add ~~ and place cursor in middle
+        if not self.text_buffer.get_has_selection():  # Nothing has been selected, add ~~ and place cursor in middle
             self.text_buffer.insert_at_cursor("~~")
             loc = self.text_buffer.get_iter_at_mark(self.text_buffer.get_insert())
             loc.backward_chars(1)
             self.text_buffer.place_cursor(loc)
-        else:  # convert selection to subscript
+        else:  # Convert selection to subscript
             selection_bounds = self.text_buffer.get_selection_bounds()
             mark1 = self.text_buffer.create_mark(None, selection_bounds[0], False)
             mark2 = self.text_buffer.create_mark(None, selection_bounds[1], False)
@@ -1004,7 +1097,7 @@ class RemarkableWindow(Window):
     def on_menuitem_horizonatal_rule_activate(self, widget):
         if not self.text_buffer.get_has_selection():
             self.text_buffer.insert_at_cursor("\n***\n")
-        else:  # turn selection bold
+        else:  # Turn selection bold
             selection_bounds = self.text_buffer.get_selection_bounds()
             markR = self.text_buffer.create_mark(None, selection_bounds[1], False)
             self.text_buffer.insert(self.text_buffer.get_iter_at_mark(markR), "\n***\n")
@@ -1064,7 +1157,7 @@ class RemarkableWindow(Window):
     def insert_image_cmd(self, widget, window):
         if self.entry_url_i.get_text():
             if self.entry_title_i.get_text():
-                if self.entry_alt_text_i.get_text():  # fill alt_text with a space ( > 1 char required)
+                if self.entry_alt_text_i.get_text():  # Fill alt_text with a space ( > 1 char required)
                     link = "![" + self.entry_alt_text_i.get_text() + "](" + self.entry_url_i.get_text()
                     link += '  "' + self.entry_title_i.get_text() + '")'
                     self.text_buffer.insert_at_cursor(link)
@@ -1127,10 +1220,10 @@ class RemarkableWindow(Window):
         self.insert_window_link.hide()
 
 
-    #styles
+    # Styles
     def update_style(self, widget):
         self.default_html_start = '<!doctype HTML><html><head><meta charset="utf-8"><title>Made with Remarkable!</title><link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.1/styles/github.min.css">'
-        self.default_html_start += "<style type='text/css'>" + styles.css + "</style>" ##Change this to default style
+        self.default_html_start += "<style type='text/css'>" + styles.css + "</style>"
         self.default_html_start += "</head><body>"
 
     def on_menuitem_dark_activate(self, widget):
@@ -1243,7 +1336,7 @@ class RemarkableWindow(Window):
         self.update_live_preview(self)
         self.remarkable_settings['style'] = "custom"
         self.write_settings()
-    ##End Custom CSS
+    ## End Custom CSS
 
     def on_menuitem_github_page_activate(self, widget):
         webbrowser.open_new_tab("https://github.com/jamiemcg/remarkable")
@@ -1297,40 +1390,29 @@ class RemarkableWindow(Window):
 
     def on_text_view_changed(self, widget):
         start, end = self.text_buffer.get_bounds()
-        if self.text_buffer.can_undo:
-            self.builder.get_object("menuitem_undo").set_sensitive(True)
-            self.builder.get_object("toolbutton_undo").set_sensitive(True)
-
-        else:
-            self.builder.get_object("menuitem_undo").set_sensitive(False)
-            self.builder.get_object("toolbutton_undo").set_sensitive(False)
-
-        if self.text_buffer.can_redo:
-            self.builder.get_object("menuitem_redo").set_sensitive(True)
-            self.builder.get_object("toolbutton_redo").set_sensitive(True)
-        else:
-            self.builder.get_object("menuitem_redo").set_sensitive(False)
-            self.builder.get_object("toolbutton_redo").set_sensitive(False)
-
+        
         if self.statusbar.get_visible():
             self.update_status_bar(self)
-        else:  # statusbar not present, don't need to update/calculate
+        else:  # statusbar not present, don't need to update/count words, etc.
             pass
         if self.live_preview.get_visible():
             self.update_live_preview(self)
             self.scrollPreviewTo(self)
 
-        else:  # live preview not enabled, don't need to update the view
+        else:  # Live preview not enabled, don't need to update the view
             pass
 
-        #Update  title to reflect changes
+        # Update title to reflect changes
         if self.text_buffer.get_modified():
             title = self.window.get_title()
             if title[0] != "*":
                 title = "*" + title
                 self.window.set_title(title)
 
-
+    """
+        Update the text in the status bar. Displays the number of lines,
+        words and characters. This approach is possible inefficient.
+    """
     def update_status_bar(self, widget):
         self.statusbar.pop(self.context_id)
         lines = self.text_buffer.get_line_count()
@@ -1339,7 +1421,7 @@ class RemarkableWindow(Window):
         word_count = 0
         word_exceptions = ["#", "##", "###", "####", "#####", "######", "*", "**", "-", "+", "_", "/", "\\", "/", ":",
                            ";", "@", "'", "~", "(", ")", "[", "]", "{", "}", "((", "))", "+-", "-+", "/=", ".", "|",
-                           "!", "!!", "!!!", "$", "", "%", "^", "&"]  # exclude these from word count
+                           "!", "!!", "!!!", "$", "", "%", "^", "&"]  # Exclude these from word count
         for w in words:
             if w not in word_exceptions:
                 if not re.match('^[0-9]{1,3}$', w):
