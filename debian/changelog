@@ -1,3 +1,11 @@
+remarkable (1.87) xenial; urgency=medium
+
+	* Image paste support, GtkSource, line numbers, markdown syntax 
+	highlighting, improves new and open process, horizontal layout, join and
+	sort functions, markdown tutorial, improved styles, misc. bugs fixes 
+
+ -- Jamie McGowan <jamiemcgowan.dev@gmail.com>  Thu, 16 Jun 2016 21:10:40 +0100
+
 remarkable (1.75) xenial; urgency=medium
 
 	* Fixed startup error, partial local image support, bug fixes

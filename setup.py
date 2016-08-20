@@ -144,7 +144,7 @@ class InstallAndUpdateDataDirectory(DistUtilsExtra.auto.install_auto):
 
 DistUtilsExtra.auto.setup(
     name='remarkable',
-    version='1.75',
+    version='1.87',
     license='MIT',
     author='Jamie McGowan',
     author_email='jamiemcgowan.dev@gmail.com',

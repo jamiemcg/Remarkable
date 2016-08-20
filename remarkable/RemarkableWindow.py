@@ -56,11 +56,10 @@ logger = logging.getLogger('remarkable')
 #Ignore warnings re. scroll handler (temp. fix) && starting GTK warning
 warnings.filterwarnings("ignore", ".*has no handler with id.*")
 
-from remarkable_lib import Window
+from remarkable_lib import Window, remarkableconfig
 from remarkable.AboutRemarkableDialog import AboutRemarkableDialog
-from remarkable.PreferencesRemarkableDialog import PreferencesRemarkableDialog
 
-app_version = 1.75 #Remarkable app version
+app_version = 1.87 #Remarkable app version
 
 class RemarkableWindow(Window):
     __gtype_name__ = "RemarkableWindow"
@@ -70,7 +69,6 @@ class RemarkableWindow(Window):
         super(RemarkableWindow, self).finish_initializing(builder)
 
         self.AboutDialog = AboutRemarkableDialog
-        self.PreferencesDialog = PreferencesRemarkableDialog
 
         self.settings = Gtk.Settings.get_default()
 
@@ -79,14 +77,15 @@ class RemarkableWindow(Window):
         self.homeDir = os.environ['HOME']
         self.path = os.path.join(self.homeDir, ".remarkable/")
         self.settings_path = os.path.join(self.path, "remarkable.settings")
-
+        self.media_path = remarkableconfig.get_data_path() + os.path.sep + "media" + os.path.sep
+        
         self.name = "Untitled" #Title of the current file, set to 'Untitled' as default
 
         self.default_html_start = '<!doctype HTML><html><head><meta charset="utf-8"><title>Made with Remarkable!</title><link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.1/styles/github.min.css">'
         self.default_html_start += "<style type='text/css'>" + styles.css + "</style>"
         self.default_html_start += "</head><body id='MathPreviewF'>"
         self.default_html_end = '<script src="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.1/highlight.min.js"></script><script>hljs.initHighlightingOnLoad();</script><script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script><script type="text/javascript">MathJax.Hub.Config({"showProcessingMessages" : false,"messageStyle" : "none","tex2jax": { inlineMath: [ [ "$", "$" ] ] }});</script></body></html>'
-
+        
         self.remarkable_settings = {}
 
         self.default_extensions = ['markdown.extensions.extra','markdown.extensions.toc', 'markdown.extensions.smarty', 'markdown.extensions.nl2br', 'markdown.extensions.urlize', 'markdown.extensions.Highlighting', 'markdown.extensions.Strikethrough', 'markdown.extensions.markdown_checklist', 'markdown.extensions.superscript', 'markdown.extensions.subscript', 'markdown.extensions.mathjax']
@@ -726,7 +725,7 @@ class RemarkableWindow(Window):
             # No selection active, sort all lines in reverse
             start, end = self.text_buffer.get_bounds()
             self.text_buffer.sort_lines(start, end, GtkSource.SortFlags.REVERSE_ORDER, 0)
-
+    
     def on_menuitem_copy_all_activate(self, widget):
         text = self.text_buffer.get_text(self.text_buffer.get_start_iter(), self.text_buffer.get_end_iter(), False)
         try:
@@ -783,8 +782,7 @@ class RemarkableWindow(Window):
             self.text_view.set_show_line_numbers(False)
             self.remarkable_settings['line-numbers'] = False
         self.write_settings()
-
-
+            
     def on_menuitem_live_preview_activate(self, widget):
         self.toggle_live_preview(self)
 
@@ -875,7 +873,6 @@ class RemarkableWindow(Window):
             self.builder.get_object("menuitem_toolbar").set_label("Show Toolbar")
             self.builder.get_object("toolbar1").set_visible(False)
             self.remarkable_settings['toolbar'] = False
-
         else:
             self.toolbar.set_visible(True)
             self.builder.get_object("menuitem_toolbar").set_label("Hide Toolbar")
@@ -900,7 +897,7 @@ class RemarkableWindow(Window):
         html = self.default_html_start + html_middle + self.default_html_end
         tf.write(html.encode())
         tf.flush()
-
+        
         # Load the temporary HTML file in the user's default browser
         webbrowser.open_new_tab(tf_name)
 
@@ -1359,6 +1356,10 @@ class RemarkableWindow(Window):
 
     def on_menuitem_about_activate(self, widget):
         self.AboutDialog.show(self)
+
+    def on_menuitem_markdown_tutorial_activate(self, widget):
+        tutorial_path = self.media_path  + "MarkdownTutorial.md"
+        subprocess.Popen(["remarkable", tutorial_path])
 
     def on_menuitem_homepage_activate(self, widget):
         webbrowser.open_new_tab("http://remarkableapp.github.io")

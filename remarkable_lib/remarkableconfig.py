@@ -32,7 +32,7 @@ __all__ = [
 # files). By default, this is ../data, relative your trunk layout
 __remarkable_data_directory__ = '/usr/share/remarkable/'
 __license__ = 'MIT'
-__version__ = '1.75'
+__version__ = '1.87'
 
 import os
 

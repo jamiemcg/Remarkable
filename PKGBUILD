@@ -1,7 +1,7 @@
 # Maintainer: Michael Goehler <somebody dot here at gmx dot de>
 
 pkgname=remarkable
-pkgver=1.75
+pkgver=1.87
 pkgrel=2
 pkgdesc="A free fully featured markdown editor for Linux."
 arch=('i686' 'x86_64')

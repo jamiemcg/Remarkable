@@ -11,7 +11,7 @@
     <property name="icon">remarkable.png</property>
     <property name="type_hint">dialog</property>
     <property name="program_name">Remarkable</property>
-    <property name="version">1.75</property>
+    <property name="version">1.87</property>
     <property name="copyright" translatable="yes">Copyright (C) 2016 Jamie McGowan 
 
 &lt;jamiemcgowan.dev@gmail.com&gt;</property>

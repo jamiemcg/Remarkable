@@ -64,12 +64,8 @@ class Window(Gtk.Window):
         # Get a reference to the builder and set up the signals.
         self.builder = builder
         self.ui = builder.get_ui(self, True)
-        self.PreferencesDialog = None # class
-        self.preferences_dialog = None # instance
+        
         self.AboutDialog = None # class
-
-        self.settings = Gio.Settings("net.launchpad.remarkable")
-        self.settings.connect('changed', self.on_preferences_changed)
 
         # Optional application indicator support
         # Run 'quickly add indicator' to get started.
