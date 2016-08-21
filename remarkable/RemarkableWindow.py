@@ -96,12 +96,13 @@ class RemarkableWindow(Window):
         self.window.connect("delete-event", self.window_delete_event)
         self.window.connect("destroy", self.quit_requested)
 
-        self.text_view = GtkSource.View()
+        self.text_buffer = GtkSource.Buffer()
+        self.text_view = GtkSource.View.new_with_buffer(self.text_buffer)
         self.text_view.set_show_line_numbers(True)
         self.text_view.set_auto_indent(True)
         
+        # Force the SourceView to use a SourceBuffer and not a TextBuffer
         self.lang_manager = GtkSource.LanguageManager()
-        self.text_buffer = self.text_view.get_buffer()
         self.text_buffer.set_language(self.lang_manager.get_language('markdown'))
         self.text_buffer.set_highlight_matching_brackets(True)
         

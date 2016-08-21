@@ -20,7 +20,7 @@ options=('!emptydirs' '!strip')
 install="${pkgname}.install"
 source=("http://remarkableapp.github.io/files/${pkgname}_${pkgver}_all.deb"
         "${pkgname}.install")
-md5sums=('d973cdda95b777300cced66021392a44'
+md5sums=('b14b7bf5b4d4cbf2acb9559220bba982'
          '4230de2876e8789bcd5a7cdc84b2a30b')
 
 package() {
@@ -42,7 +42,7 @@ package() {
          -o "${pkgdir}/usr/share/licenses/${pkgname}/license.txt"
 
     msg2 "Fixing module include path..."
-    sed -i "s/import undobuffer/from remarkable import undobuffer/" \
+    sed -i "s/import styles/from remarkable import styles/" \
            "${pkgdir}/${_python_site}/remarkable/RemarkableWindow.py"
 
     msg2 "Removing unnecessities..."
