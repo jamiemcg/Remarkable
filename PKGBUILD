@@ -2,7 +2,7 @@
 
 pkgname=remarkable
 pkgver=1.87
-pkgrel=2
+pkgrel=1
 pkgdesc="A free fully featured markdown editor for Linux."
 arch=('i686' 'x86_64')
 url="http://remarkableapp.github.io"
@@ -20,7 +20,7 @@ options=('!emptydirs' '!strip')
 install="${pkgname}.install"
 source=("http://remarkableapp.github.io/files/${pkgname}_${pkgver}_all.deb"
         "${pkgname}.install")
-md5sums=('b594bffade610c5c33f8afc504a446bb'
+md5sums=('d973cdda95b777300cced66021392a44'
          '4230de2876e8789bcd5a7cdc84b2a30b')
 
 package() {
