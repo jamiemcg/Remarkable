@@ -6,7 +6,8 @@ Remarkable is an open source Markdown Editor for Linux.
 You can download the latest version from the [project site](https://remarkableapp.github.io/linux.html).
 It is also available on the [AUR](https://aur.archlinux.org/packages/remarkable/). It has already been downloaded more than 35,000 times!
 
-![Remarkable Screenshot](http://remarkableapp.github.io/images/alice.png)
+![Remarkable](http://remarkableapp.github.io/images/main_screenshot.png)
+![Remarkable Syntax Highlighting](http://remarkableapp.github.io/images/syntax_highlighting.png)
 
 ###Features
 
