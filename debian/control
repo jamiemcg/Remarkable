@@ -3,7 +3,7 @@ Version: 1.87
 Architecture: all
 Maintainer: Jamie McGowan <jamiemcgowan.dev@gmail.com>
 Installed-Size: 388
-Depends: python3 | python, dconf-gsettings-backend | gsettings-backend, gir1.2-glib-2.0, gir1.2-gtk-3.0, python3-markdown, python3-bs4, gir1.2-webkit-3.0, yelp, wkhtmltopdf, python3-gi
+Depends: python3 | python, dconf-gsettings-backend | gsettings-backend, gir1.2-glib-2.0, gir1.2-gtk-3.0, python3-markdown, python3-bs4, gir1.2-webkit-3.0, gir1.2-gtksource-3.0, yelp, wkhtmltopdf, python3-gi
 Section: python
 Priority: extra
 Description: A free fully featured markdown editor.

@@ -872,6 +872,14 @@
                       </object>
                     </child>
                     <child>
+                      <object class="GtkMenuItem" id="markdown_tutorial">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="label" translatable="yes">Markdown Tutorial</property>
+                        <property name="use_underline">True</property>
+                      </object>
+                    </child>
+                    <child>
                       <object class="GtkMenuItem" id="menuitem_homepage">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
