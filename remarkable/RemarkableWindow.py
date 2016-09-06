@@ -520,6 +520,7 @@ class RemarkableWindow(Window):
         start, end = self.text_buffer.get_bounds()
         text = self.text_buffer.get_text(start, end, False)
         text = self.text_buffer.get_text(self.text_buffer.get_start_iter(), self.text_buffer.get_end_iter(), False)
+        text = re.sub(r'(\!\[.*\]\()([^/].*\))',r'\1{}/\2'.format(os.path.dirname(self.name)),text)
         try:
             html_middle = markdown.markdown(text, self.default_extensions)
         except:
@@ -888,6 +889,7 @@ class RemarkableWindow(Window):
         tf_name = tf.name
 
         text = self.text_buffer.get_text(self.text_buffer.get_start_iter(), self.text_buffer.get_end_iter(), False)
+        text = re.sub(r'(\!\[.*\]\()([^/].*\))',r'\1{}/\2'.format(os.path.dirname(self.name)),text)
         try:
             html_middle = markdown.markdown(text, self.default_extensions)
         except:
