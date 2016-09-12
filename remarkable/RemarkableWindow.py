@@ -40,7 +40,7 @@ import styles
 import unicodedata
 import warnings
 import datetime
-
+import locale
 
 #Check if gtkspellcheck is installed
 try:
@@ -560,14 +560,28 @@ class RemarkableWindow(Window):
             if not file_name.endswith(".pdf"):
                 file_name += ".pdf"
             try:
-                pdfkit.from_string(html, file_name, options= {'quiet': '', 'page-size': 'Letter',
-                    'margin-top': '0.75in',
-                    'margin-right': '0.75in',
-                    'margin-bottom': '0.75in',
-                    'margin-left': '0.75in',
-                    'encoding': "UTF-8",
-                    'javascript-delay' : '550',
-                    'no-outline': None})
+                if 'de' in locale.getlocale()[0]:
+                    pdfkit.from_string(html, file_name, options= {
+                        'quiet': '',
+                        'page-size': 'A4',
+                        'margin-top': '20mm',
+                        'margin-right': '20mm',
+                        'margin-bottom': '20mm',
+                        'margin-left': '20mm',
+                        'encoding': "UTF-8",
+                        'javascript-delay' : '550',
+                        'no-outline': None})
+                else:
+                    pdfkit.from_string(html, file_name, options= {
+                        'quiet': '',
+                        'page-size': 'Letter',
+                        'margin-top': '0.75in',
+                        'margin-right': '0.75in',
+                        'margin-bottom': '0.75in',
+                        'margin-left': '0.75in',
+                        'encoding': "UTF-8",
+                        'javascript-delay' : '550',
+                        'no-outline': None})
             except:
                 try:
                     #Failed so try with no options
