@@ -6,3 +6,4 @@ Exec=/usr/bin/remarkable %f
 Icon=remarkable
 Terminal=false
 Type=Application
+MimeType=text/markdown;text/x-markdown;
