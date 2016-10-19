@@ -12,6 +12,7 @@ depends=('python'
          'python-gobject'
          'python-markdown'
          'python-beautifulsoup4'
+         'python-lxml'
          'python-gtkspellcheck'
          'webkitgtk'
          'wkhtmltopdf')
