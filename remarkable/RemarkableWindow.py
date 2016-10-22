@@ -27,7 +27,7 @@ gi.require_version('GtkSource', '3.0')
 gi.require_version('WebKit', '3.0')
 
 from bs4 import BeautifulSoup
-from gi.repository import Gdk, Gtk, GtkSource, Pango, WebKit
+from gi.repository import Gdk, Gtk, GLib, GtkSource, Pango, WebKit
 from locale import gettext as _
 from urllib.request import urlopen
 import markdown
@@ -40,7 +40,10 @@ import styles
 import unicodedata
 import warnings
 import datetime
+import threading
 
+# Use threads                                       
+GLib.threads_init()
 
 #Check if gtkspellcheck is installed
 try:
@@ -60,6 +63,49 @@ from remarkable_lib import Window, remarkableconfig
 from remarkable.AboutRemarkableDialog import AboutRemarkableDialog
 
 app_version = 1.87 #Remarkable app version
+
+
+class UpdateThread(threading.Thread):
+    """ Performs updates to the live preview in another thread
+    """
+    def __init__(self, parent):
+        self.cv = threading.Condition()
+        self.parent = parent
+        self.should_exit = False
+        self.text = ""
+        super(UpdateThread, self).__init__()
+
+    def run(self):
+        while True:
+            with self.cv:
+                self.cv.wait()  # Sleep until notified
+                if self.should_exit:
+                    break
+                try:
+                    html_middle = markdown.markdown(self.text, self.parent.default_extensions)
+                except:
+                    try:
+                        html_middle = markdown.markdown(self.text, extensions=self.parent.safe_extensions)
+                    except:
+                        html_middle = markdown.markdown(self.text)
+                html = self.parent.default_html_start + html_middle + self.parent.default_html_end
+
+                # Run the update to the live preview in the main thread:             
+                GLib.idle_add(self.do_update_live_preview, html, priority=GLib.PRIORITY_LOW)
+
+    def do_update_live_preview(self, html):
+        """Update the display in the main thread (GTK is not thread-safe), supporting relative paths to local images"""
+        self.parent.live_preview.load_string(html, "text/html", "utf-8", "file://{}".format(os.path.abspath(self.parent.name)))
+        self.parent.scrollPreviewTo(self.parent)
+
+    def notify(self):
+        with self.cv:
+            self.cv.notify()
+
+    def shutdown(self):
+        self.should_exit = True
+        self.notify()
+
 
 class RemarkableWindow(Window):
     __gtype_name__ = "RemarkableWindow"
@@ -138,6 +184,11 @@ class RemarkableWindow(Window):
         self.context_id = self.statusbar.get_context_id("main status bar")
 
         self.clipboard = Gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD)
+
+        self.timeout_id = None
+        self.update_thread = UpdateThread(self)
+        self.update_thread.start()
+
         self.update_status_bar(self)
         self.update_live_preview(self)
 
@@ -605,6 +656,8 @@ class RemarkableWindow(Window):
 
     def quit_requested(self, widget, callback_data=None):
         self.clean_up() # Second time, just to be safe
+        self.update_thread.shutdown()
+        self.update_thread.join()
         Gtk.main_quit()
 
     def on_menuitem_undo_activate(self, widget):
@@ -1431,20 +1484,18 @@ class RemarkableWindow(Window):
         self.status_message = "Lines: " + str(lines) + ", " + "Words: " + str(word_count) + ", Characters: " + str(chars)
         self.statusbar.push(self.context_id, self.status_message)
 
-    def update_live_preview(self, widet):
-        text = self.text_buffer.get_text(self.text_buffer.get_start_iter(), self.text_buffer.get_end_iter(), False)
-        try:
-            html_middle = markdown.markdown(text, self.default_extensions)
-        except:
-            try:
-                html_middle = markdown.markdown(text, extensions =self.safe_extensions)
-            except:
-                html_middle = markdown.markdown(text)
-        html = self.default_html_start + html_middle + self.default_html_end
+    def update_live_preview(self, widget):
+        def delayed_update_request():
+            self.timeout_id = None
+            self.update_thread.text = self.text_buffer.get_text(self.text_buffer.get_start_iter(), self.text_buffer.get_end_iter(), False)
+            self.update_thread.notify()
+            return False
 
-        # Update the display, supporting relative paths to local images
-        self.live_preview.load_string(html, "text/html", "utf-8", "file://{}".format(os.path.abspath(self.name)))
-
+        if self.timeout_id:  # The timeout hasn't fired, and since we have a new request, we cancel the stale one
+            GLib.source_remove(self.timeout_id)
+        
+        self.timeout_id = GLib.timeout_add(200, delayed_update_request)  # Wait for 200 ms before triggering the actual update
+        
     """
         This function suppresses the messages from the WebKit (live preview) console
     """
