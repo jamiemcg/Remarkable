@@ -19,7 +19,7 @@ Remarkable has many features including:
 - MathJax Support
 - Styles
 - Custom CSS Support
-- Keybaord Shortcuts
+- Keyboard Shortcuts
 
 Check out the [homepage](https://remarkableapp.github.io/linux.html) for more details and [screenshots](https://remarkableapp.github.io/linux/screenshots.html).
 
