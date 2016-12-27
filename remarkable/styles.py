@@ -452,8 +452,7 @@ body, table tr {
     background-color: #fff;
 }
 table tr td, table tr th {
-    border: 1px solid #ccc;
-    text-align: left;
+    border: 1px solid #ddd;
     padding: 6px 13px;
     margin: 0;
 }
@@ -470,8 +469,12 @@ body {
     word-wrap: break-word;
     padding: 10px 15px;
 }
-strong, table tr th {
+strong {
     font-weight: 700;
+}
+table tr th {
+    font-weight: bold;
+    text-align: left;
 }
 h1 {
     font-size: 2em;
@@ -520,9 +523,10 @@ ol {
 table tr {
     border-top: 1px solid #ccc;
     margin: 0;
+    background-color: #fff;
 }
 table tr:nth-child(2n) {
-    background-color: #aaa;
+    background-color: #f8f8f8;
 }
 table tr td :first-child, table tr th :first-child {
     margin-top: 0;
@@ -557,6 +561,11 @@ pre code {
     overflow: auto;
     padding: 6px 10px;
     border-radius: 3px;
+}
+table {
+    display: block;
+    width: 100%;
+    overflow: auto;
 }
 """
 
