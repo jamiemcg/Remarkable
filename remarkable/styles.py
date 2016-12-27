@@ -474,7 +474,6 @@ strong {
 }
 table tr th {
     font-weight: bold;
-    text-align: left;
 }
 h1 {
     font-size: 2em;
@@ -566,6 +565,7 @@ table {
     display: block;
     width: 100%;
     overflow: auto;
+    border-collapse: collapse;
 }
 """
 
