@@ -28,9 +28,9 @@ __all__ = [
     'get_data_path',
     ]
 
-# Where your project will look for your data (for instance, images and ui
-# files). By default, this is ../data, relative your trunk layout
-__remarkable_data_directory__ = '/usr/share/remarkable/'
+# Where your project will look for your data
+#(for instance, images and ui files).
+__remarkable_data_directories__ = ['../data', '/usr/share/remarkable']
 __license__ = 'MIT'
 __version__ = '1.87'
 
@@ -60,15 +60,16 @@ def get_data_path():
     is specified at installation time.
     """
 
-    # Get pathname absolute or relative.
-    path = os.path.join(
-        os.path.dirname(__file__), __remarkable_data_directory__)
+    for data_dir in __remarkable_data_directories__:
+        path = os.path.join(
+            os.path.dirname(__file__), data_dir)
 
-    abs_data_path = os.path.abspath(path)
-    if not os.path.exists(abs_data_path):
-        raise project_path_not_found
+        abs_data_path = os.path.abspath(path)
 
-    return abs_data_path
+        if os.path.exists(abs_data_path):
+            return abs_data_path
+
+    raise project_path_not_found
 
 
 def get_version():
