@@ -148,6 +148,20 @@
                       </object>
                     </child>
                     <child>
+                      <object class="GtkCheckMenuItem" id="menuitem_rtl">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="tooltip_text" translatable="yes">Set the file mode to right-to-left text</property>
+                        <property name="label" translatable="yes">Right to Left</property>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkSeparatorMenuItem" id="menuitem_file_separator_3">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                      </object>
+                    </child>
+                    <child>
                       <object class="GtkMenuItem" id="menuitem_export_html_plain">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
@@ -192,7 +206,7 @@
                       </object>
                     </child>
                     <child>
-                      <object class="GtkSeparatorMenuItem" id="menuitem_file_separator_3">
+                      <object class="GtkSeparatorMenuItem" id="menuitem_file_separator_4">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                       </object>
