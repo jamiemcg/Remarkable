@@ -11,6 +11,26 @@ screen = 'html{font-size:62.5%}body{font-family:Helvetica,Arial,sans-serif;font-
 solarized_dark = 'h1,h2{border-bottom:1px solid}html a:hover,html pre{background-color:#073642}blockquote,body,h1,h2,h3,h4,h5,h6,html,img,li,ol,p,ul{margin:0;padding:0;font:inherit;vertical-align:baseline}img,ol,p,pre,ul{margin-bottom:20px}html *{font-family:ff-din-web-pro-1,ff-din-web-pro-2,sans-serif;font-size:16px;line-height:19.2px;color-profile:sRGB;color:#839496}body{margin:40px 70px}p{font-weight:lighter}strong{font-weight:700}ol,ul{margin-left:2em}ol ol,ol ul,ul ol,ul ul{margin-top:10px}li{margin-bottom:3px}h1,h2,h3,h4,h5,h6{font-weight:lighter;text-transform:capitalize;margin-top:20px;margin-bottom:10px}.hljs-strong,h1,mark{font-weight:700}h1,h2{font-size:24.62px;line-height:29.55px}h3{font-size:23.44px;line-height:28.13px}h4,h5,h6{font-size:22.16px;line-height:26.59px}h1 img,h2 img,h3 img,h4 img,h5 img,h6 img,p img{margin-bottom:0}pre{white-space:pre;white-space:pre-wrap;word-wrap:break-word;padding:15px}code,pre{font-family:monospace}blockquote{border-left:4px solid;padding:0 15px}blockquote>:first-child{margin-top:0}blockquote>:last-child{margin-bottom:15px}h1{text-transform:uppercase}h3,h4,h5,h6{border-bottom:none}html body{background-color:#002b36}html h1,html h2,html h3,html h4,html h5,html h6{border-color:#839496}html pre{color:#93a1a1}html a,html a:active,html a:visited,html code.url,html h1,html h2,html h3,html h4,html h5,html h6{color:#b58900}@media print{body{margin:0}*{color:#000!important}}table{border-collapse:collapse}td,th{border:1px solid #839496;padding:.5rem;text-align:left}mark{background-color:#93a1a1;color:#000}.hljs{display:block;overflow-x:auto;padding:.5em;background:#002b36;color:#839496}.hljs-comment,.hljs-quote{color:#586e75}.hljs-addition,.hljs-keyword,.hljs-selector-tag{color:#859900}.hljs-doctag,.hljs-literal,.hljs-meta .hljs-meta-string,.hljs-number,.hljs-regexp,.hljs-string{color:#2aa198}.hljs-name,.hljs-section,.hljs-selector-class,.hljs-selector-id,.hljs-title{color:#268bd2}.hljs-attr,.hljs-attribute,.hljs-class .hljs-title,.hljs-template-variable,.hljs-type,.hljs-variable{color:#b58900}.hljs-bullet,.hljs-link,.hljs-meta,.hljs-meta .hljs-keyword,.hljs-selector-attr,.hljs-selector-pseudo,.hljs-subst,.hljs-symbol{color:#cb4b16}.hljs-built_in,.hljs-deletion{color:#dc322f}.hljs-formula{background:#073642}.hljs-emphasis{font-style:italic}'
 solarized_light = 'h1,h2{border-bottom:1px solid}html a:hover,html pre{background-color:#eee8d5}blockquote,body,h1,h2,h3,h4,h5,h6,html,img,li,ol,p,ul{margin:0;padding:0;font:inherit;vertical-align:baseline}img,ol,p,pre,ul{margin-bottom:20px}html *{font-family:ff-din-web-pro-1,ff-din-web-pro-2,sans-serif;font-size:16px;line-height:19.2px;color-profile:sRGB;color:#657b83}body{margin:40px 70px}p{font-weight:lighter}strong{font-weight:700}ol,ul{margin-left:2em}ol ol,ol ul,ul ol,ul ul{margin-top:10px}li{margin-bottom:3px}h1,h2,h3,h4,h5,h6{font-weight:lighter;text-transform:capitalize;margin-top:20px;margin-bottom:10px}.hljs-strong,h1,mark{font-weight:700}h1,h2{font-size:24.62px;line-height:29.55px}h3{font-size:23.44px;line-height:28.13px}h4,h5,h6{font-size:22.16px;line-height:26.59px}h1 img,h2 img,h3 img,h4 img,h5 img,h6 img,p img{margin-bottom:0}pre{white-space:pre;white-space:pre-wrap;word-wrap:break-word;padding:15px}code,pre{font-family:monospace}blockquote{border-left:4px solid;padding:0 15px}blockquote>:first-child{margin-top:0}blockquote>:last-child{margin-bottom:15px}h1{text-transform:uppercase}h3,h4,h5,h6{border-bottom:none}html body{background-color:#fdf6e3}html h1,html h2,html h3,html h4,html h5,html h6{border-color:#657b83}html pre{color:#586e75}html a,html a:active,html a:visited,html code.url,html h1,html h2,html h3,html h4,html h5,html h6{color:#b58900}@media print{body{margin:0}*{color:#000!important}}table{border-collapse:collapse}td,th{border:1px solid #657b83;padding:.5rem;text-align:left}.hljs{display:block;overflow-x:auto;padding:.5em;background:#fdf6e3;color:#657b83}.hljs-comment,.hljs-quote{color:#93a1a1}.hljs-addition,.hljs-keyword,.hljs-selector-tag{color:#859900}.hljs-doctag,.hljs-literal,.hljs-meta .hljs-meta-string,.hljs-number,.hljs-regexp,.hljs-string{color:#2aa198}.hljs-name,.hljs-section,.hljs-selector-class,.hljs-selector-id,.hljs-title{color:#268bd2}.hljs-attr,.hljs-attribute,.hljs-class .hljs-title,.hljs-template-variable,.hljs-type,.hljs-variable{color:#b58900}.hljs-bullet,.hljs-link,.hljs-meta,.hljs-meta .hljs-keyword,.hljs-selector-attr,.hljs-selector-pseudo,.hljs-subst,.hljs-symbol{color:#cb4b16}.hljs-built_in,.hljs-deletion{color:#dc322f}.hljs-formula{background:#eee8d5}.hljs-emphasis{font-style:italic}'
 custom_css = ''
-css = github # Github is the default style (css) applied to the markdown
+
+__css = github # Github is the default style (css) applied to the markdown
+__rtl = False
+
+def set(style):
+    global __css
+    __css = style
+
+def get():
+    if not __rtl:
+        return __css
+    else:
+        return __css + ' body { direction: rtl; }'
+
+def rtl(enabled = None):
+    global __rtl
+
+    if enabled is None:
+        return __rtl
+
+    __rtl = enabled
 
 # End of CSS declarations

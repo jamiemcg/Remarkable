@@ -82,7 +82,7 @@ class RemarkableWindow(Window):
         self.name = "Untitled" #Title of the current file, set to 'Untitled' as default
 
         self.default_html_start = '<!doctype HTML><html><head><meta charset="utf-8"><title>Made with Remarkable!</title><link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.1/styles/github.min.css">'
-        self.default_html_start += "<style type='text/css'>" + styles.css + "</style>"
+        self.default_html_start += "<style type='text/css'>" + styles.get() + "</style>"
         self.default_html_start += "</head><body id='MathPreviewF'>"
         self.default_html_end = '<script src="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.1/highlight.min.js"></script><script>hljs.initHighlightingOnLoad();</script><script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script><script type="text/javascript">MathJax.Hub.Config({"showProcessingMessages" : false,"messageStyle" : "none","tex2jax": { inlineMath: [ [ "$", "$" ] ] }});</script></body></html>'
         
@@ -273,29 +273,29 @@ class RemarkableWindow(Window):
         try:
             self.style = self.remarkable_settings['style']
             if self.style == "dark":
-                styles.css = styles.dark
+                styles.set(styles.dark)
             elif self.style == "foghorn":
-                styles.css = styles.foghorn
+                styles.set(styles.foghorn)
             elif self.style == "github":
-                styles.css = styles.github
+                styles.set(styles.github)
             elif self.style == "handwriting_css":
-                styles.css = styles.handwriting_css
+                styles.set(styles.handwriting_css)
             elif self.style == "markdown":
-                styles.css = styles.markdown
+                styles.set(styles.markdown)
             elif self.style == "metro_vibes":
-                styles.css = styles.metro_vibes
+                styles.set(styles.metro_vibes)
             elif self.style == "metro_vibes_dark":
-                styles.css = styles.metro_vibes_dark
+                styles.set(styles.metro_vibes_dark)
             elif self.style == "modern_css":
-                styles.css = styles.modern_css
+                styles.set(styles.modern_css)
             elif self.style == "screen":
-                styles.css = styles.screen
+                styles.set(styles.screen)
             elif self.style == "solarized_dark":
-                styles.css = styles.solarized_dark
+                styles.set(styles.solarized_dark)
             elif self.style == "solarized_light":
-                styles.css = styles.solarized_light
+                styles.set(styles.solarized_light)
             elif self.style == "custom":
-                styles.css = styles.custom_css
+                styles.set(styles.custom_css)
             else:
                 print("Style key error")
 
@@ -457,6 +457,17 @@ class RemarkableWindow(Window):
             pass
         chooser.destroy()
         self.window.set_sensitive(True)
+
+    def on_menuitem_rtl_toggled(self, widget):
+        self.rtl(widget.get_active())
+
+    def rtl(self, enabled):
+        # whatever the swap choice was, it needs to be flipped now
+        self.on_menuitem_swap_activate(None)
+
+        styles.rtl(enabled)
+        self.update_style(self)
+        self.update_live_preview(self)
 
     def on_menuitem_export_html_activate(self, widget):
         self.window.set_sensitive(False)
@@ -1221,32 +1232,32 @@ class RemarkableWindow(Window):
     # Styles
     def update_style(self, widget):
         self.default_html_start = '<!doctype HTML><html><head><meta charset="utf-8"><title>Made with Remarkable!</title><link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.1/styles/github.min.css">'
-        self.default_html_start += "<style type='text/css'>" + styles.css + "</style>"
+        self.default_html_start += "<style type='text/css'>" + styles.get() + "</style>"
         self.default_html_start += "</head><body>"
 
     def on_menuitem_dark_activate(self, widget):
-        styles.css = styles.dark
+        styles.set(styles.dark)
         self.update_style(self)
         self.update_live_preview(self)
         self.remarkable_settings['style'] = "dark"
         self.write_settings()
 
     def on_menuitem_foghorn_activate(self, widget):
-        styles.css = styles.foghorn
+        styles.set(styles.foghorn)
         self.update_style(self)
         self.update_live_preview(self)
         self.remarkable_settings['style'] = "foghorn"
         self.write_settings()
 
     def on_menuitem_github_activate(self, widget):
-        styles.css = styles.github
+        styles.set(styles.github)
         self.update_style(self)
         self.update_live_preview(self)
         self.remarkable_settings['style'] = "github"
         self.write_settings()
 
     def on_menuitem_handwritten_activate(self, widget):
-        styles.css = styles.handwriting_css
+        styles.set(styles.handwriting_css)
         self.update_style(self)
         self.update_live_preview(self)
         self.live_preview.zoom_in()
@@ -1254,21 +1265,21 @@ class RemarkableWindow(Window):
         self.write_settings()
 
     def on_menuitem_markdown_activate(self, widget):
-        styles.css = styles.markdown
+        styles.set(styles.markdown)
         self.update_style(self)
         self.update_live_preview(self)
         self.remarkable_settings['style'] = "markdown"
         self.write_settings()
 
     def on_menuitem_metro_vibes_activate(self, widget):
-        styles.css = styles.metro_vibes
+        styles.set(styles.metro_vibes)
         self.update_style(self)
         self.update_live_preview(self)
         self.remarkable_settings['style'] = "metro_vibes"
         self.write_settings()
 
     def on_menuitem_metro_vibes_dark_activate(self, widget):
-        styles.css = styles.metro_vibes_dark
+        styles.set(styles.metro_vibes_dark)
         self.update_style(self)
         self.update_live_preview(self)
         self.remarkable_settings['style'] = "metro_vibes_dark"
@@ -1276,28 +1287,28 @@ class RemarkableWindow(Window):
 
 
     def on_menuitem_modern_activate(self, widget):
-        styles.css = styles.modern_css
+        styles.set(styles.modern_css)
         self.update_style(self)
         self.update_live_preview(self)
         self.remarkable_settings['style'] = "modern_css"
         self.write_settings()
 
     def on_menuitem_screen_activate(self, widget):
-        styles.css = styles.screen
+        styles.set(styles.screen)
         self.update_style(self)
         self.update_live_preview(self)
         self.remarkable_settings['style'] = "screen"
         self.write_settings()
     
     def on_menuitem_solarized_dark_activate(self, widget):
-        styles.css = styles.solarized_dark
+        styles.set(styles.solarized_dark)
         self.update_style(self)
         self.update_live_preview(self)
         self.remarkable_settings['style'] = "solarized_dark"
         self.write_settings()
 
     def on_menuitem_solarized_light_activate(self, widget):
-        styles.css = styles.solarized_light
+        styles.set(styles.solarized_light)
         self.update_style(self)
         self.update_live_preview(self)
         self.remarkable_settings['style'] = "solarized_light"
@@ -1327,8 +1338,8 @@ class RemarkableWindow(Window):
     def apply_custom_css(self, widget, window, tb):
         start, end = tb.get_bounds()
         self.custom_css = tb.get_text(start, end, False).replace("'", '"')
-        styles.css = self.custom_css
-        self.remarkable_settings['css'] = styles.css
+        styles.set(self.custom_css)
+        self.remarkable_settings['css'] = styles.get()
         window.hide()
         self.update_style(self)
         self.update_live_preview(self)

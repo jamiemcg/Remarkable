@@ -148,20 +148,6 @@
                       </object>
                     </child>
                     <child>
-                      <object class="GtkCheckMenuItem" id="menuitem_rtl">
-                        <property name="visible">True</property>
-                        <property name="can_focus">False</property>
-                        <property name="tooltip_text" translatable="yes">Set the file mode to right-to-left text</property>
-                        <property name="label" translatable="yes">Right to Left</property>
-                      </object>
-                    </child>
-                    <child>
-                      <object class="GtkSeparatorMenuItem" id="menuitem_file_separator_3">
-                        <property name="visible">True</property>
-                        <property name="can_focus">False</property>
-                      </object>
-                    </child>
-                    <child>
                       <object class="GtkMenuItem" id="menuitem_export_html_plain">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
@@ -206,7 +192,7 @@
                       </object>
                     </child>
                     <child>
-                      <object class="GtkSeparatorMenuItem" id="menuitem_file_separator_4">
+                      <object class="GtkSeparatorMenuItem" id="menuitem_file_separator_3">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                       </object>
@@ -238,20 +224,20 @@
                     <child>
                       <object class="GtkMenuItem" id="menuitem_undo">
                         <property name="visible">True</property>
+                        <property name="sensitive">False</property>
                         <property name="can_focus">False</property>
                         <property name="label" translatable="yes">Undo</property>
                         <property name="use_underline">True</property>
-                        <property name="sensitive">False</property>
                         <accelerator key="z" signal="activate" modifiers="GDK_CONTROL_MASK"/>
                       </object>
                     </child>
                     <child>
                       <object class="GtkMenuItem" id="menuitem_redo">
                         <property name="visible">True</property>
+                        <property name="sensitive">False</property>
                         <property name="can_focus">False</property>
                         <property name="label" translatable="yes">Redo</property>
                         <property name="use_underline">True</property>
-                        <property name="sensitive">False</property>
                         <accelerator key="z" signal="activate" modifiers="GDK_SHIFT_MASK | GDK_CONTROL_MASK"/>
                       </object>
                     </child>
@@ -321,7 +307,6 @@
                         <property name="use_underline">True</property>
                       </object>
                     </child>
-                    
                     <child>
                       <object class="GtkSeparatorMenuItem" id="menuitem2">
                         <property name="visible">True</property>
@@ -337,7 +322,6 @@
                         <property name="use_underline">True</property>
                       </object>
                     </child>
-                    
                     <child>
                       <object class="GtkMenuItem" id="menuitem_sort_lines">
                         <property name="visible">True</property>
@@ -356,7 +340,6 @@
                         <property name="use_underline">True</property>
                       </object>
                     </child>
-                    
                     <child>
                       <object class="GtkSeparatorMenuItem" id="menuitem3x">
                         <property name="visible">True</property>
@@ -417,10 +400,17 @@
                       <object class="GtkCheckMenuItem" id="menuitem_vertical_layout">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
-                        <property name="label" translatable="yes">Vertical Layout</property>
                         <property name="tooltip_text" translatable="yes">When enabled, the editor pane and live preview pane will be stacked vertically</property>
+                        <property name="label" translatable="yes">Vertical Layout</property>
                         <property name="use_underline">True</property>
-                        <property name="active">False</property>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkCheckMenuItem" id="menuitem_rtl">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="tooltip_text" translatable="yes">Set the file mode to right-to-left text</property>
+                        <property name="label" translatable="yes">Right to Left</property>
                       </object>
                     </child>
                     <child>
@@ -913,7 +903,6 @@
                     </child>
                     <child>
                       <object class="GtkMenuItem" id="mnu_about">
-                        <!-- <property name="related_action"/> -->
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="label" translatable="yes">About</property>
