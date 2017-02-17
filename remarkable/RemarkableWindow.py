@@ -116,7 +116,6 @@ class RemarkableWindow(Window):
 
         self.live_preview = WebKit.WebView()
         self.live_preview.connect("console-message", self._javascript_console_message) # Suppress .js output
-        self.live_preview.zoom_out()
 
         self.scrolledwindow_text_view = Gtk.ScrolledWindow()
         self.scrolledwindow_text_view.add(self.text_view)
@@ -207,7 +206,8 @@ class RemarkableWindow(Window):
             self.remarkable_settings['style'] = "github"
             self.remarkable_settings['toolbar'] = True
             self.remarkable_settings['vertical'] = False
-            self.remarkable_settings['word-wrap'] = True                    
+            self.remarkable_settings['word-wrap'] = True
+            self.remarkable_settings['zoom-level'] = 1
             settings_file = open(self.settings_path, 'w')
             settings_file.write(str(self.remarkable_settings))
             settings_file.close()
@@ -261,6 +261,9 @@ class RemarkableWindow(Window):
         if self.remarkable_settings['vertical'] == True:
             # Switch to vertical layout
             self.builder.get_object("menuitem_vertical_layout").set_active(True)
+
+        if 'zoom-level' in self.remarkable_settings:
+            self.live_preview.set_zoom_level(self.remarkable_settings['zoom-level'])
 
         # Try to load the previously chosen font, may fail as font may not exist, ect.
         try:
@@ -636,10 +639,14 @@ class RemarkableWindow(Window):
 
     def on_toolbutton_zoom_in_clicked(self, widget):
         self.live_preview.zoom_in()
+        self.remarkable_settings['zoom-level'] = self.live_preview.get_zoom_level()
+        self.write_settings()
         self.scrollPreviewToFix(self)
 
     def on_toolbutton_zoom_out_clicked(self, widget):
         self.live_preview.zoom_out()
+        self.remarkable_settings['zoom-level'] = self.live_preview.get_zoom_level()
+        self.write_settings()
         self.scrollPreviewToFix(self)
 
     def redo(self, widget):
@@ -1262,7 +1269,6 @@ class RemarkableWindow(Window):
         styles.set(styles.handwriting_css)
         self.update_style(self)
         self.update_live_preview(self)
-        self.live_preview.zoom_in()
         self.remarkable_settings['style'] = "handwriting_css"
         self.write_settings()
 
