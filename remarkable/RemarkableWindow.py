@@ -658,6 +658,8 @@ class RemarkableWindow(Window):
             start, end = self.text_buffer.get_selection_bounds()
             text = self.text_buffer.get_text(start, end, True)
             self.clipboard.set_text(text, -1)
+        elif self.live_preview.can_copy_clipboard():
+            self.live_preview.copy_clipboard()
 
     def on_menuitem_paste_activate(self, widget):
         text = self.clipboard.wait_for_text()
