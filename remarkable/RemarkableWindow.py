@@ -208,6 +208,7 @@ class RemarkableWindow(Window):
             self.remarkable_settings['vertical'] = False
             self.remarkable_settings['word-wrap'] = True
             self.remarkable_settings['zoom-level'] = 1
+            self.remarkable_settings['rtl'] = False
             settings_file = open(self.settings_path, 'w')
             settings_file.write(str(self.remarkable_settings))
             settings_file.close()
@@ -264,6 +265,9 @@ class RemarkableWindow(Window):
 
         if 'zoom-level' in self.remarkable_settings:
             self.live_preview.set_zoom_level(self.remarkable_settings['zoom-level'])
+
+        if 'rtl' in self.remarkable_settings and self.remarkable_settings['rtl']:
+            self.builder.get_object("menuitem_rtl").set_active(True)
 
         # Try to load the previously chosen font, may fail as font may not exist, ect.
         try:
@@ -463,6 +467,8 @@ class RemarkableWindow(Window):
 
     def on_menuitem_rtl_toggled(self, widget):
         self.rtl(widget.get_active())
+        self.remarkable_settings['rtl'] = widget.get_active()
+        self.write_settings()
 
     def rtl(self, enabled):
         # whatever the swap choice was, it needs to be flipped now
