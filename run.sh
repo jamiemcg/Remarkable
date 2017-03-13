@@ -1,2 +1,3 @@
 #!/bin/bash
-PYTHONPATH=$PWD/remarkable:$PWD/remarkable_lib exec bin/remarkable
+foldername=`dirname $(readlink -f $0)`
+PYTHONPATH=$foldername/remarkable:$foldername/remarkable_lib exec $foldername/bin/remarkable
