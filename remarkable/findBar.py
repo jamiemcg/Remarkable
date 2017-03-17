@@ -15,18 +15,19 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from gi.repository import GtkSource # pylint: disable=E0611
+from gi.repository import Gdk
 
 
 class FindBar(object):
-    def __init__(self, wrap_box, find_entry, replace_entry,
+    def __init__(self, widget, wrap_box, find_entry, replace_entry,
                  match_case, whole_word, regex):
+        self.widget = widget
         self.set_text_view(None)
         self.wrap_box = wrap_box
         self.find_entry = find_entry
         self.replace_entry = replace_entry
         # self.arrow_left.show()
         # self.arrow_right.show()
-        # parent.connect('set-focus-child', self.on_focus_child)
 
         settings = GtkSource.SearchSettings()
         match_case.bind_property('active', settings, 'case-sensitive')
@@ -35,6 +36,7 @@ class FindBar(object):
         self.find_entry.bind_property('text', settings, 'search-text')
         settings.set_wrap_around(True)
         self.search_settings = settings
+        self.widget.connect('key-press-event', self.on_key_press)
 
     def on_focus_child(self, container, widget):
         if widget is not None:
@@ -43,10 +45,20 @@ class FindBar(object):
                 self.hide()
         return False
 
+    def on_key_press(self, widget, event):
+        if event.keyval == Gdk.KEY_Escape:
+            self.hide()
+
     def hide(self):
-        self.set_text_view(None)
+        #self.set_text_view(None)
         self.wrap_box.set_visible(False)
         self.widget.hide()
+
+    def show(self):
+        #self.set_text_view(None)
+        self.wrap_box.set_visible(True)
+        self.find_entry.grab_focus()
+        self.widget.show()
 
     def set_text_view(self, textview):
         self.textview = textview

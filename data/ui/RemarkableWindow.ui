@@ -251,6 +251,22 @@
                       </object>
                     </child>
                     <child>
+                      <object class="GtkSeparatorMenuItem" id="menuitem_edit_sep0">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkMenuItem" id="menuitem_find">
+                        <property name="visible">True</property>
+                        <property name="sensitive">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="label" translatable="yes">Find</property>
+                        <property name="use_underline">True</property>
+                        <accelerator key="f" signal="activate" modifiers="GDK_CONTROL_MASK"/>
+                      </object>
+                    </child>
+                    <child>
                       <object class="GtkSeparatorMenuItem" id="menuitem_edit_sep1">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
@@ -1210,6 +1226,7 @@
         <child>
           <object class="GtkGrid" id="findbar">
             <property name="can_focus">False</property>
+            <property name="no_show_all">True</property>
             <property name="column_spacing">6</property>
             <child>
               <object class="GtkHButtonBox" id="hbuttonbox2">

@@ -148,7 +148,8 @@ class RemarkableWindow(Window):
         match_case = self.builder.get_object("match_case")
         whole_word = self.builder.get_object("whole_word")
         regex = self.builder.get_object("regex")
-        self.findbar = FindBar(self.wrap_box, self.find_entry, self.replace_entry,
+        findbar = self.builder.get_object('findbar')
+        self.findbar = FindBar(findbar, self.wrap_box, self.find_entry, self.replace_entry,
                                match_case, whole_word, regex)
         self.findbar.set_text_view(self.text_view)
 
@@ -170,7 +171,7 @@ class RemarkableWindow(Window):
 
         #Check if an updated version of application exists
         _thread.start_new_thread(self.check_for_updates, ())
-        
+
         self.text_view.grab_focus()
         
         if spellcheck_enabled:
@@ -685,6 +686,9 @@ class RemarkableWindow(Window):
     def redo(self, widget):
         if self.text_buffer.can_redo():
             self.text_buffer.redo()
+
+    def on_menuitem_find_activate(self, widget):
+        self.findbar.show()
 
     def on_menuitem_cut_activate(self, widget):
         if self.text_buffer.get_has_selection():
