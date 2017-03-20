@@ -113,6 +113,7 @@ class RemarkableWindow(Window):
         self.text_buffer.connect("changed", self.on_text_view_changed)
         self.text_view.set_buffer(self.text_buffer)
         self.text_view.set_wrap_mode(Gtk.WrapMode.WORD)
+        self.text_view.connect('key-press-event', self.cursor_ctrl_arrow_rtl_fix)
 
         self.live_preview = WebKit.WebView()
         self.live_preview.connect("console-message", self._javascript_console_message) # Suppress .js output
@@ -1466,6 +1467,46 @@ class RemarkableWindow(Window):
             if title[0] != "*":
                 title = "*" + title
                 self.window.set_title(title)
+
+    """
+        GtkTextView simply does not seem to handle visual word
+        movements correctly in bi-directional move.
+        This is a hack for going the opposite of logical order
+        in case RTL mode was selected in the editor.
+        It's not perfect, but at least for people who are mostly
+        working in RTL mode the cursor will behave as expected
+        more frequently.
+
+        The inherent bug here, of course, is that if there
+        is an English paragraph in an RTL document, the cursor
+        will go backwards on that specific paragraph.
+        This might be fixed if we look at the current
+        paragraph and infer how to act based on its type.
+        But I didn't bother for now, as this, admittedly,
+        is a double edge case: 1) RTL users; and 2) Having
+        English paragraphs and caring about Ctrl+Arrows behavior
+        in them to the point where it gets irritating.
+
+        In short, this is a quick, but useful, hack.
+    """
+    def cursor_ctrl_arrow_rtl_fix(self, widget, event):
+        if event.keyval in [Gdk.KEY_Left, Gdk.KEY_Right]:
+            if event.state & Gdk.ModifierType.CONTROL_MASK:
+                is_rtl = self.remarkable_settings['rtl']
+
+                dirs = {
+                    Gdk.KEY_Left: is_rtl and 1 or -1,
+                    Gdk.KEY_Right: is_rtl and -1 or 1,
+                }
+
+                widget.emit('move-cursor',
+                            Gtk.MovementStep.WORDS,
+                            dirs[event.keyval],
+                            event.state & Gdk.ModifierType.SHIFT_MASK != 0)
+
+                return True
+
+        return False
 
     """
         Update the text in the status bar. Displays the number of lines,
