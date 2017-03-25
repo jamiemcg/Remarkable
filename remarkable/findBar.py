@@ -36,7 +36,9 @@ class FindBar(object):
         self.find_entry.bind_property('text', settings, 'search-text')
         settings.set_wrap_around(True)
         self.search_settings = settings
-        self.widget.connect('key-press-event', self.on_key_press)
+        self.widget.connect('key-press-event', self.on_find_bar_key_press)
+        self.find_entry.connect('key-press-event', self.on_find_entry_key_press)
+        self.find_entry.connect('key-release-event', self.on_find_entry_key_release)
 
     def on_focus_child(self, container, widget):
         if widget is not None:
@@ -45,9 +47,19 @@ class FindBar(object):
                 self.hide()
         return False
 
-    def on_key_press(self, widget, event):
+    def on_find_bar_key_press(self, widget, event):
         if event.keyval == Gdk.KEY_Escape:
             self.hide()
+
+    def on_find_entry_key_press(self, widget, event):
+        if event.keyval == Gdk.KEY_Return:
+            self._find_text(backwards=self.is_searching_backwards)
+        elif event.keyval == Gdk.KEY_Shift_R or event.keyval == Gdk.KEY_Shift_L:
+            self.is_searching_backwards = True
+
+    def on_find_entry_key_release(self, widget, event):
+        if event.keyval == Gdk.KEY_Shift_R or event.keyval == Gdk.KEY_Shift_L:
+            self.is_searching_backwards = False
 
     def hide(self):
         #self.set_text_view(None)
