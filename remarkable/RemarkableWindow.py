@@ -1068,29 +1068,54 @@ class RemarkableWindow(Window):
             start_iter = self.text_buffer.get_iter_at_line(line_number)
             self.text_buffer.insert(start_iter, "- ")
 
+    def _text_buffer_get_iter_at_line_end(self, line_number):
+        iter = self.text_buffer.get_iter_at_line(line_number)
+        iter.forward_chars(iter.get_chars_in_line() - 1)
+        return iter
+
+
+    def _drop_leading_heading(self, line_number):
+        start_iter = self.text_buffer.get_iter_at_line(line_number)
+        end_iter = self._text_buffer_get_iter_at_line_end(line_number)
+
+        iter = start_iter.copy()
+        iter2 = start_iter.copy()
+
+        while iter.forward_find_char(lambda char, _: char == u'#', user_data=None, limit=end_iter):
+            iter2.forward_char()
+        while iter.forward_find_char(lambda char, _: char == u' ', user_data=None, limit=end_iter):
+            iter2.forward_char()
+        if not start_iter.equal(iter2):
+            self.text_buffer.delete(start_iter, iter2)
+
+
     def on_menuitem_heading_1_activate(self, widget):
         temp_iter = self.text_buffer.get_iter_at_mark(self.text_buffer.get_insert())
         line_number = temp_iter.get_line()
+        self._drop_leading_heading(line_number)
         start_iter = self.text_buffer.get_iter_at_line(line_number)
-        self.text_buffer.insert(start_iter, "#")
+        self.text_buffer.insert(start_iter, "# ")
 
     def on_menuitem_heading_2_activate(self, widget):
         temp_iter = self.text_buffer.get_iter_at_mark(self.text_buffer.get_insert())
         line_number = temp_iter.get_line()
+        self._drop_leading_heading(line_number)
         start_iter = self.text_buffer.get_iter_at_line(line_number)
-        self.text_buffer.insert(start_iter, "##")
+        self.text_buffer.insert(start_iter, "## ")
 
     def on_menuitem_heading_3_activate(self, widget):
         temp_iter = self.text_buffer.get_iter_at_mark(self.text_buffer.get_insert())
         line_number = temp_iter.get_line()
+        self._drop_leading_heading(line_number)
         start_iter = self.text_buffer.get_iter_at_line(line_number)
-        self.text_buffer.insert(start_iter, "###")
+        self.text_buffer.insert(start_iter, "### ")
 
     def on_menuitem_heading_4_activate(self, widget):
         temp_iter = self.text_buffer.get_iter_at_mark(self.text_buffer.get_insert())
         line_number = temp_iter.get_line()
+        self._drop_leading_heading(line_number)
         start_iter = self.text_buffer.get_iter_at_line(line_number)
-        self.text_buffer.insert(start_iter, "####")
+        self.text_buffer.insert(start_iter, "#### ")
 
     def on_menuitem_horizonatal_rule_activate(self, widget):
         if not self.text_buffer.get_has_selection():
