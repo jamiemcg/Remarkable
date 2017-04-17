@@ -1,4 +1,4 @@
-#A h1 header
+# A h1 header
 
 Paragraphs are separated by a blank line.
 
@@ -49,7 +49,7 @@ public class Markdown {
 You can specifiy which programming language you are using with delimited blocks if you wish
 
 ~~~c
-#include <stdio.h>
+# include <stdio.h>
 int main()
 {
    printf("Remarkable markdown editor");
