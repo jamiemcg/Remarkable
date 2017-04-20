@@ -64,10 +64,33 @@ app_version = 1.87 #Remarkable app version
 class RemarkableWindow(Window):
     __gtype_name__ = "RemarkableWindow"
     
+    #add an item in the style menu
+    def add_menuItem_Style(self, item):
+        menuitem = Gtk.MenuItem(item,True)
+        menuitem.set_label(item)
+        menuitem.set_visible(True)
+        menuitem.set_can_focus(False)
+        menuitem.connect("activate", self.on_menuitem_style_activate)
+        self.builder.get_object("menu7").append(menuitem)
+    
     def finish_initializing(self, builder): # pylint: disable=E1002
         """Set up the main window"""
         super(RemarkableWindow, self).finish_initializing(builder)
-
+		
+		# Load the style file
+        styles.dic_style = styles.loadStyle();
+        styles.css = styles.dic_style.get('github')
+        
+        #menu styles
+        for item in styles.dic_style.keys() :
+            self.add_menuItem_Style(item)
+        '''
+        <object class="GtkSeparatorMenuItem" id="menuitem_style_sep1">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                      </object>
+        '''
+        
         self.AboutDialog = AboutRemarkableDialog
 
         self.settings = Gtk.Settings.get_default()
@@ -176,6 +199,12 @@ class RemarkableWindow(Window):
 
         self.temp_file_list = []
 
+    def on_destroy(self, widget, data=None):
+        super(RemarkableWindow, self).on_destroy(widget, data)
+		#save css styles
+        styles.saveStyle()
+
+
     def can_redo_changed(self, widget):
         if self.text_buffer.can_redo():
             self.builder.get_object("menuitem_redo").set_sensitive(True)
@@ -272,33 +301,11 @@ class RemarkableWindow(Window):
         # Try to load the previously chosen style. May fail if so, ignore
         try:
             self.style = self.remarkable_settings['style']
-            if self.style == "dark":
-                styles.css = styles.dark
-            elif self.style == "foghorn":
-                styles.css = styles.foghorn
-            elif self.style == "github":
-                styles.css = styles.github
-            elif self.style == "handwriting_css":
-                styles.css = styles.handwriting_css
-            elif self.style == "markdown":
-                styles.css = styles.markdown
-            elif self.style == "metro_vibes":
-                styles.css = styles.metro_vibes
-            elif self.style == "metro_vibes_dark":
-                styles.css = styles.metro_vibes_dark
-            elif self.style == "modern_css":
-                styles.css = styles.modern_css
-            elif self.style == "screen":
-                styles.css = styles.screen
-            elif self.style == "solarized_dark":
-                styles.css = styles.solarized_dark
-            elif self.style == "solarized_light":
-                styles.css = styles.solarized_light
-            elif self.style == "custom":
-                styles.css = styles.custom_css
+            
+            if self.style in styles.dic_style :
+                styles.css=styles.dic_style.get(self.style)
             else:
                 print("Style key error")
-
             self.update_style(self)
             self.update_live_preview(self)
         except:
@@ -1224,110 +1231,91 @@ class RemarkableWindow(Window):
         self.default_html_start += "<style type='text/css'>" + styles.css + "</style>"
         self.default_html_start += "</head><body>"
 
-    def on_menuitem_dark_activate(self, widget):
-        styles.css = styles.dark
+    def on_menuitem_style_activate(self, widget):
+        name = widget.get_label()
+        styles.css = styles.dic_style.get(name)
         self.update_style(self)
         self.update_live_preview(self)
-        self.remarkable_settings['style'] = "dark"
-        self.write_settings()
-
-    def on_menuitem_foghorn_activate(self, widget):
-        styles.css = styles.foghorn
-        self.update_style(self)
-        self.update_live_preview(self)
-        self.remarkable_settings['style'] = "foghorn"
-        self.write_settings()
-
-    def on_menuitem_github_activate(self, widget):
-        styles.css = styles.github
-        self.update_style(self)
-        self.update_live_preview(self)
-        self.remarkable_settings['style'] = "github"
-        self.write_settings()
-
-    def on_menuitem_handwritten_activate(self, widget):
-        styles.css = styles.handwriting_css
-        self.update_style(self)
-        self.update_live_preview(self)
-        self.live_preview.zoom_in()
-        self.remarkable_settings['style'] = "handwriting_css"
-        self.write_settings()
-
-    def on_menuitem_markdown_activate(self, widget):
-        styles.css = styles.markdown
-        self.update_style(self)
-        self.update_live_preview(self)
-        self.remarkable_settings['style'] = "markdown"
-        self.write_settings()
-
-    def on_menuitem_metro_vibes_activate(self, widget):
-        styles.css = styles.metro_vibes
-        self.update_style(self)
-        self.update_live_preview(self)
-        self.remarkable_settings['style'] = "metro_vibes"
-        self.write_settings()
-
-    def on_menuitem_metro_vibes_dark_activate(self, widget):
-        styles.css = styles.metro_vibes_dark
-        self.update_style(self)
-        self.update_live_preview(self)
-        self.remarkable_settings['style'] = "metro_vibes_dark"
-        self.write_settings()
-
-
-    def on_menuitem_modern_activate(self, widget):
-        styles.css = styles.modern_css
-        self.update_style(self)
-        self.update_live_preview(self)
-        self.remarkable_settings['style'] = "modern_css"
-        self.write_settings()
-
-    def on_menuitem_screen_activate(self, widget):
-        styles.css = styles.screen
-        self.update_style(self)
-        self.update_live_preview(self)
-        self.remarkable_settings['style'] = "screen"
-        self.write_settings()
-    
-    def on_menuitem_solarized_dark_activate(self, widget):
-        styles.css = styles.solarized_dark
-        self.update_style(self)
-        self.update_live_preview(self)
-        self.remarkable_settings['style'] = "solarized_dark"
-        self.write_settings()
-
-    def on_menuitem_solarized_light_activate(self, widget):
-        styles.css = styles.solarized_light
-        self.update_style(self)
-        self.update_live_preview(self)
-        self.remarkable_settings['style'] = "solarized_light"
-        self.write_settings()
-
+        self.remarkable_settings['style'] = name
+        self.write_settings()  
+        
     ##Custom CSS
     def on_menuitem_custom_activate(self, widget):
+        #custom window
         self.custom_window = Gtk.Window()
         self.custom_window.set_default_size(640, 480)
         self.custom_window.set_position(Gtk.WindowPosition.CENTER)
         self.custom_window.set_title("Custom CSS")
-
+        
+        #main panel
         self.custom_vbox = Gtk.VBox()
+        self.custom_hbox = Gtk.HBox()
+        
         self.custom_scroller = Gtk.ScrolledWindow()
-        self.custom_button = Gtk.Button("Apply")
-        self.custom_vbox.pack_end(self.custom_button, False, False, 0)
+        self.custom_button_apply = Gtk.Button("Apply")
+        self.custom_button_save = Gtk.Button("Save")
+        
+        #declare widget
         self.custom_text_view = Gtk.TextView()
+        self.custom_name_text_view = Gtk.TextView()
+        self.custom_divide = Gtk.SeparatorMenuItem()
+        
+        #declare buffer
         self.custom_text_buffer = Gtk.TextBuffer()
-        self.custom_text_buffer.set_text(self.custom_css)
+        self.custom_text_buffer_name = Gtk.TextBuffer()
+        
+        #init buffer
+        self.custom_text_buffer.set_text(styles.dic_style.get('customCss'))
+        self.custom_text_buffer_name.set_text("")
+        
+        #init widget
         self.custom_text_view.set_buffer(self.custom_text_buffer)
+        self.custom_name_text_view.set_buffer(self.custom_text_buffer_name)
+        
+        #scroller
         self.custom_scroller.add(self.custom_text_view)
+        
+        #Add
+        
+        #hbox
+        self.custom_hbox.pack_start(self.custom_button_apply, True, True, 0)
+        self.custom_hbox.pack_end(self.custom_button_save, True, True, 0)
+        
+        #vbox
+        self.custom_vbox.pack_start(self.custom_name_text_view, False, False, 0)
+        self.custom_vbox.pack_start(self.custom_divide, False, False, 0)
         self.custom_vbox.pack_start(self.custom_scroller, True, True, 0)
+        self.custom_vbox.pack_end(self.custom_hbox, False, False, 0)
+        
         self.custom_window.add(self.custom_vbox)
         self.custom_window.show_all()
-        self.custom_button.connect("clicked", self.apply_custom_css, self.custom_window, self.custom_text_buffer)
+        
+        self.custom_button_apply.connect("clicked", self.apply_custom_css, self.custom_window, self.custom_text_buffer)
+        self.custom_button_save.connect("clicked", self.save_custom_css, self.custom_window, self.custom_text_buffer, self.custom_text_buffer_name)
 
     def apply_custom_css(self, widget, window, tb):
         start, end = tb.get_bounds()
-        self.custom_css = tb.get_text(start, end, False).replace("'", '"')
-        styles.css = self.custom_css
+        styles.addStyle('customCss',tb.get_text(start, end, False).replace("'", '"'))
+        styles.css = styles.dic_style.get('customCss')
+        self.remarkable_settings['css'] = styles.css
+        window.hide()
+        self.update_style(self)
+        self.update_live_preview(self)
+        self.remarkable_settings['style'] = "custom"
+        self.write_settings()
+        
+    def save_custom_css(self, widget, window, tb, bname):
+        start, end = tb.get_bounds()
+        start1, end1 = bname.get_bounds()
+        name = bname.get_text(start1, end1, False).replace("'", '"')
+        #if the new css doesn't gat a name, we don't save it and it take the place of the custom css
+        if name=="" : 
+            styles.addStyle('customCss',tb.get_text(start, end, False).replace("'", '"'))
+            styles.css = styles.dic_style.get('customCss')
+        else :#save the custom css
+            styles.addStyle(name,tb.get_text(start, end, False).replace("'", '"'))
+            styles.css = styles.dic_style.get(name)
+            self.add_menuItem_Style(name)
         self.remarkable_settings['css'] = styles.css
         window.hide()
         self.update_style(self)
