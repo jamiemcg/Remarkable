@@ -31,7 +31,7 @@ install_data('LICENSE', install_dir : 'share/doc/remarkable')
 install_data('README.md', install_dir : 'share/doc/remarkable')
 
 message('Installing Python files')
-install_subdir('markdown/extensions', install_dir: python_dir)
+install_subdir('markdown/extensions', install_dir: python_dir/markdown)
 install_subdir('pdfkit', install_dir: python_dir)
 install_subdir('remarkable', install_dir: python_dir)
 install_subdir('remarkable_lib', install_dir: python_dir)

@@ -36,15 +36,17 @@ rm -rf %{buildroot}
 
 %files
 %defattr(-,root,root,-)
-%do LICENSE README.md
+%doc LICENSE README.md
 %{_bindir}/remarkable
 %{python3_sitelib}/remarkable
 %{python3_sitelib}/remarkable_lib
-%{python3_sitelib}/extensions
+%{python3_sitelib}/markdown/extensions
 %{python3_sitelib}/pdfkit
 %{_datadir}/glib-2.0/schemas
+%{_datadir}/remarkable/ui
 %{_datadir}/icons/hicolor/256x256/apps/remarkable.png
 %{_datadir}/icons/hicolor/scaleable/apps/remarkable.svg
+%{_datadir}/remarkable/media/MarkdownTutorial.md
 %{_datadir}/appdata/remarkable.appdata.xml
 %{_datadir}/applications/remarkable.desktop
 
