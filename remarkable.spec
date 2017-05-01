@@ -1,9 +1,9 @@
 Summary:	Markdown editor
-Name:		Remarkable
+Name:		remarkable
 Version:	1.87
 Release:	1
 
-Source:		https://github.com/jamiemcg/Remarkable/archive/remarkable-1.87-1-gf9ebac5.tar.xz
+Source:		https://github.com/jamiemcg/Remarkable/archive/remarkable-%{version}.tar.xz
 Packager:	uraeus@gnome.org
 License:	MIT
 Group:		Applications/Productivity
@@ -11,6 +11,8 @@ URL:		https://remarkableapp.github.io/
 BuildRoot:      %{_tmppath}/remarkable-%{version}-%{release}-root-%(%{__id_u} -n)
 
 Requires:	python3
+BuildRequires: python3-devel
+BuildRequires: meson
 
 BuildArch: 	noarch
 
@@ -18,16 +20,13 @@ BuildArch: 	noarch
 Remarkable markdown editor application. Allows you to edit in Markdown format for use with Wikis.
 
 %prep
-%setup
+%autosetup
 
-%install
-
-xz -d remarkable-1.87-1-gf9ebac5.tar.xz
-tar -xvf remarkable-1.87-1-gf9ebac5.tar
-cd remarkable-1.87-1-gf9ebac5
-meson install
-
+%build
+%meson
+%meson_build
 desktop-file-validate remarkable.desktop
+%meson_install
 
 %post
 gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
@@ -37,13 +36,14 @@ rm -rf %{buildroot}
 
 %files
 %defattr(-,root,root,-)
-%doc 
+%do LICENSE README.md
 %{_bindir}/remarkable
-%{_libdir}/python3/dist-packages/markdown/extensions
-%{_libdir}/python3/dist-packages/pdfkit
-%{_libdir}/python3/dist-packages/remarkable
-%{_libdir}/python3/dist-packages/remarkable_lib
-%{_datadir}/remarkable/ui/*.*
+%{python3_sitelib}/remarkable
+%{python3_sitelib}/remarkable_lib
+%{python3_sitelib}/extensions
+%{python3_sitelib}/pdfkit
+%{_datadir}/glib-2.0/schemas
+%{_datadir}/icons/hicolor/256x256/apps/remarkable.png
 %{_datadir}/icons/hicolor/scaleable/apps/remarkable.svg
 %{_datadir}/appdata/remarkable.appdata.xml
 %{_datadir}/applications/remarkable.desktop

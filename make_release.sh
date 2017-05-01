@@ -9,12 +9,12 @@ echo 'Done testing for src dir'
 cd $srcdir
 
 echo 'Getting version number from git'
-VERSION=$(git describe --tags)
+VERSION=$(git describe --tags --abbrev=0)
 echo 'Setting name'
 NAME="remarkable-${VERSION}"
 
 echo "Creating git tree archive…"
-git archive --prefix="${NAME}/" --format=tar HEAD > remarkable-${VERSION}.tar
+git archive --prefix="${NAME}/" --format=tar HEAD > ${NAME}.tar
 
 echo "Compressing archive…"
 xz --verbose -f "${NAME}.tar"
