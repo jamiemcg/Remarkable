@@ -23,6 +23,7 @@ Remarkable markdown editor application. Allows you to edit in Markdown format fo
 %autosetup
 
 %build
+
 %meson
 %meson_build
 desktop-file-validate remarkable.desktop

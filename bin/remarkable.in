@@ -27,20 +27,10 @@ import os
 import locale
 locale.textdomain('remarkable')
 
-try:
-    if os.path.exists("/usr/lib/python3/"):        
-        sys.path.append("/usr/lib/python3/dist-packages/")
-        sys.path.append("/usr/lib/python3/dist-packages/remarkable")
-    else:
-        sys.path.append("/usr/lib/python/dist-packages/")
-        sys.path.append("/usr/lib/python/dist-packages/remarkable")
-except:
-    pass
-
-try:
-    sys.path.append("/usr/lib64/python3/dist-packages/")
-except:
-    pass
+# Make sure we'll find the pygobject module, even in JHBuild
+sys.path.insert(1, '@pyexecdir@')
+# Make sure we'll find the gnomemusic module, even in JHBuild
+sys.path.insert(1, '@pythondir@')
 
 # Add project root directory (enable symlink and trunk execution)
 PROJECT_ROOT_DIRECTORY = os.path.abspath(

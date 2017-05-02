@@ -1,0 +1,11 @@
+Build started at 2017-05-01T21:52:57.292575
+Python binary: /usr/bin/python3
+Python system: Linux
+The Meson build system
+Version: 0.40.0
+Source dir: /home/cschalle/devel/remarkable/bin
+Build dir: /home/cschalle/devel/remarkable/bin/build
+Build type: native build
+
+Meson encountered an error:
+First statement must be a call to project
