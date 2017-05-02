@@ -18,7 +18,8 @@ endif
 
 message('Python version installed : ' + py3_version)
 message('Python library path : ' + py3_purelib)
-
+pythonlibpath=join_paths(get_option('prefix'),py3_purelib)
+message('is this it??? ' + pythonlibpath)
 # Configuration params
 
 cdata = configuration_data()
