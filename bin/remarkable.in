@@ -27,10 +27,9 @@ import os
 import locale
 locale.textdomain('remarkable')
 
-# Make sure we'll find the pygobject module, even in JHBuild
-sys.path.insert(1, PY_LIB_LOC)
-# Make sure we'll find the gnomemusic module, even in JHBuild
-sys.path.insert(1, PY_LIB_SUFFIX)
+
+sys.path.insert(1, @PY_LIB_LOC@)
+sys.path.insert(1, @PY_LIB_SUFFIX@)
 
 # Add project root directory (enable symlink and trunk execution)
 PROJECT_ROOT_DIRECTORY = os.path.abspath(
