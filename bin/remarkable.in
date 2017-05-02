@@ -28,7 +28,7 @@ import locale
 locale.textdomain('remarkable')
 
 
-sys.path.insert(1, "PYTHON_LIB_PATH@")
+sys.path.insert(1, "@PYTHON_LIB_PATH@")
 
 # Add project root directory (enable symlink and trunk execution)
 PROJECT_ROOT_DIRECTORY = os.path.abspath(
