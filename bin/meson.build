@@ -19,7 +19,6 @@ endif
 message('Python version installed : ' + py3_version)
 message('Python library path : ' + py3_purelib)
 pythonlibpath=join_paths(get_option('prefix'),py3_purelib)
-message('is this it??? ' + pythonlibpath)
 # Configuration params
 
 cdata = configuration_data()
@@ -27,7 +26,7 @@ cdata.set('PACKAGE', '"Remarkable"')
 # Configuration params
 cdata.set('PACKAGE_URL', 'https://remarkableapp.github.io/')
 cdata.set('VERSION', version)
-cdata.set('PYTHON_LIB_PATH', py3_purelib)
+cdata.set('PYTHON_LIB_PATH', pythonlibpath)
 
 
 message('Preparing init file')
