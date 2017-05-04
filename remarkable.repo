@@ -1,0 +1,6 @@
+[remarkable]
+name=Remarkable Markdown editor software and updates
+baseurl=https://raw.githubusercontent.com/cschalle/hubyum/master/noarch
+gpgcheck=0
+enabled=1
+enabled_metadata=1
