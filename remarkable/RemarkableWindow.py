@@ -24,10 +24,10 @@
 import gi
 gi.require_version('Gtk', '3.0')
 gi.require_version('GtkSource', '3.0')
-gi.require_version('WebKit', '3.0')
+gi.require_version('WebKit2', '4.0')
 
 from bs4 import BeautifulSoup
-from gi.repository import Gdk, Gtk, GtkSource, Pango, WebKit
+from gi.repository import Gdk, Gtk, GtkSource, Pango, WebKit2
 from locale import gettext as _
 from urllib.request import urlopen
 import markdown
@@ -113,10 +113,10 @@ class RemarkableWindow(Window):
         self.text_buffer.connect("changed", self.on_text_view_changed)
         self.text_view.set_buffer(self.text_buffer)
         self.text_view.set_wrap_mode(Gtk.WrapMode.WORD)
-
-        self.live_preview = WebKit.WebView()
-        self.live_preview.connect("console-message", self._javascript_console_message) # Suppress .js output
-        self.live_preview.zoom_out()
+        
+        my_settings = self.create_webkit_settings()
+        self.live_preview = WebKit2.WebView.new_with_settings(my_settings)
+        self.zoom_out(self.live_preview)
 
         self.scrolledwindow_text_view = Gtk.ScrolledWindow()
         self.scrolledwindow_text_view.add(self.text_view)
@@ -626,11 +626,11 @@ class RemarkableWindow(Window):
         self.redo(self)
 
     def on_toolbutton_zoom_in_clicked(self, widget):
-        self.live_preview.zoom_in()
+        self.zoom_in(self.live_preview)
         self.scrollPreviewToFix(self)
 
     def on_toolbutton_zoom_out_clicked(self, widget):
-        self.live_preview.zoom_out()
+        self.zoom_out(self.live_preview)
         self.scrollPreviewToFix(self)
 
     def redo(self, widget):
@@ -1253,7 +1253,7 @@ class RemarkableWindow(Window):
         styles.css = styles.handwriting_css
         self.update_style(self)
         self.update_live_preview(self)
-        self.live_preview.zoom_in()
+        self.zoom_in(self.live_preview)
         self.remarkable_settings['style'] = "handwriting_css"
         self.write_settings()
 
@@ -1351,12 +1351,12 @@ class RemarkableWindow(Window):
         window_feedback.set_title("Feedback Form")
         window_feedback.set_default_size(640, 640)
         window_feedback.set_position(Gtk.WindowPosition.CENTER)
-        feedback_browser = WebKit.WebView()
-        feedback_browser.connect("console-message", self._javascript_console_message) # Suppress .js output
+        my_settings = self.create_webkit_settings()
+        feedback_browser = WebKit2.WebView.new_with_settings(my_settings)
         feedback_scroller = Gtk.ScrolledWindow()
         feedback_scroller.add(feedback_browser)
         window_feedback.add(feedback_scroller)
-        feedback_browser.open("https://jamiemcgowan.typeform.com/to/ng5Lhc")
+        feedback_browser.load_uri("https://jamiemcgowan.typeform.com/to/ng5Lhc")
         window_feedback.show_all()
 
     def on_menuitem_about_activate(self, widget):
@@ -1447,14 +1447,45 @@ class RemarkableWindow(Window):
         html = self.default_html_start + html_middle + self.default_html_end
 
         # Update the display, supporting relative paths to local images
-        self.live_preview.load_string(html, "text/html", "utf-8", "file://{}".format(os.path.abspath(self.name)))
+        self.live_preview.load_html(html, "file://{}".format(os.path.abspath(self.name)))
 
     """
-        This function suppresses the messages from the WebKit (live preview) console
+        This function returns WebKit settings instance to suppress
+        the messages from the WebKit (live preview) console
     """
-    def _javascript_console_message(self, view, message, line, sourceid):
-        return True
+    def create_webkit_settings(self):
+        result = WebKit2.Settings()
+        result.set_enable_write_console_messages_to_stdout(False) # Suppress .js output
+        return result
 
+    """
+        This function implements zoom_in for WebKit2.WebView
+    """
+    def zoom_in(self, webView):
+        zoom_level = webView.get_zoom_level()
+        zoom_level = zoom_level + self.get_zoom_step()
+        webView.set_zoom_level(zoom_level)
+
+    """
+        This function implements zoom_out for WebKit2.WebView
+    """
+    def zoom_out(self, webView):
+        zoom_level = webView.get_zoom_level()
+        zoom_level = zoom_level - self.get_zoom_step()
+        webView.set_zoom_level(zoom_level)
+
+    """
+        This function returns the same magic number as in previous WebKit API:
+        https://lazka.github.io/pgi-docs/WebKit-3.0/classes/WebSettings.html#WebKit.WebSettings.props.zoom_step
+    """
+    def get_zoom_step(self):
+        return 0.10000000149011612
+
+    """
+        This function resets the zoom_level to the default value
+    """
+    def reset_zoom_level(self, webView):
+       webView.set_zoom_level(1.0)
 
     """
         This function deletes any temporary files that were created during execution
