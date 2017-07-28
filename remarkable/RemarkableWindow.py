@@ -114,8 +114,8 @@ class RemarkableWindow(Window):
         self.text_view.set_buffer(self.text_buffer)
         self.text_view.set_wrap_mode(Gtk.WrapMode.WORD)
         
-        my_settings = self.create_webkit_settings()
-        self.live_preview = WebKit2.WebView.new_with_settings(my_settings)
+        self.webkit_settings = self.create_webkit_settings()
+        self.live_preview = WebKit2.WebView.new_with_settings(self.webkit_settings)
         self.zoom_out(self.live_preview)
 
         self.scrolledwindow_text_view = Gtk.ScrolledWindow()
@@ -199,7 +199,8 @@ class RemarkableWindow(Window):
         if not os.path.isfile(self.settings_path):
             self.remarkable_settings = {}
             self.remarkable_settings['css'] = '' 
-            self.remarkable_settings['font'] = "Sans 10"  
+            self.remarkable_settings['font'] = "Sans 10"
+            self.remarkable_settings['js'] = True
             self.remarkable_settings['line-numbers'] = True
             self.remarkable_settings['live-preview'] = True
             self.remarkable_settings['nightmode'] = False       
@@ -234,6 +235,12 @@ class RemarkableWindow(Window):
             # Disable word wrap on startup
             self.builder.get_object("menuitem_word_wrap").set_active(False)
             self.on_menuitem_word_wrap_activate(self)
+        
+        if not 'js' in self.remarkable_settings:
+           self.remarkable_settings['js'] = True
+        if self.remarkable_settings['js'] == False:
+            # Disable Live Preview on startup
+            self.builder.get_object("menuitem_js").set_active(False)
 
         if self.remarkable_settings['live-preview'] == False:
             # Disable Live Preview on startup
@@ -812,7 +819,16 @@ class RemarkableWindow(Window):
             self.builder.get_object("toolbar1").set_visible(True)
             self.update_live_preview(self)
         self.write_settings()
-
+    
+    def on_menuitem_js_activate(self, widget):
+        self.toggle_js(self)
+    
+    def toggle_js(self, widget):
+        state = self.webkit_settings.get_enable_javascript()
+        state = not state
+        self.remarkable_settings['js'] = state
+        self.webkit_settings.set_enable_javascript(state)
+        self.write_settings()
 
     def on_menuitem_swap_activate(self, widget):
         if self.live_preview.get_visible():
@@ -1456,6 +1472,8 @@ class RemarkableWindow(Window):
     def create_webkit_settings(self):
         result = WebKit2.Settings()
         result.set_enable_write_console_messages_to_stdout(False) # Suppress .js output
+        #js = self.remarkable_settings['js']
+        result.set_enable_javascript(True) # JS-Kill-Switch for issue #175
         return result
 
     """
