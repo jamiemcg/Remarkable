@@ -1,0 +1,4 @@
+# directories/files that should be ignored in alphabetical order:
+*~
+.cache
+__pycache__
