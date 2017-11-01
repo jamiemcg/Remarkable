@@ -8,10 +8,10 @@
 # to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 # copies of the Software, and to permit persons to whom the Software is
 # furnished to do so, subject to the following conditions:
-# 
+#
 # The above copyright notice and this permission notice shall be included in
 # all copies or substantial portions of the Software.
-# 
+#
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 # IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 # FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -26,12 +26,12 @@ gi.require_version('Gtk', '3.0')
 gi.require_version('GtkSource', '3.0')
 gi.require_version('WebKit', '3.0')
 
-from bs4 import BeautifulSoup
 from gi.repository import Gdk, Gtk, GtkSource, Pango, WebKit
 from locale import gettext as _
 from urllib.request import urlopen
 import markdown
 import os
+import bs4
 import pdfkit
 import re, subprocess, datetime, os, webbrowser, _thread, sys, locale
 import tempfile
@@ -63,7 +63,7 @@ app_version = 1.87 #Remarkable app version
 
 class RemarkableWindow(Window):
     __gtype_name__ = "RemarkableWindow"
-    
+
     def finish_initializing(self, builder): # pylint: disable=E1002
         """Set up the main window"""
         super(RemarkableWindow, self).finish_initializing(builder)
@@ -78,14 +78,14 @@ class RemarkableWindow(Window):
         self.path = os.path.join(self.homeDir, ".remarkable/")
         self.settings_path = os.path.join(self.path, "remarkable.settings")
         self.media_path = remarkableconfig.get_data_path() + os.path.sep + "media" + os.path.sep
-        
+
         self.name = "Untitled" #Title of the current file, set to 'Untitled' as default
 
         self.default_html_start = '<!doctype HTML><html><head><meta charset="utf-8"><title>Made with Remarkable!</title><link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.1/styles/github.min.css">'
         self.default_html_start += "<style type='text/css'>" + styles.css + "</style>"
         self.default_html_start += "</head><body id='MathPreviewF'>"
         self.default_html_end = '<script src="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.1/highlight.min.js"></script><script>hljs.initHighlightingOnLoad();</script><script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script><script type="text/javascript">MathJax.Hub.Config({"showProcessingMessages" : false,"messageStyle" : "none","tex2jax": { inlineMath: [ [ "$", "$" ] ] }});</script></body></html>'
-        
+
         self.remarkable_settings = {}
 
         self.default_extensions = ['markdown.extensions.extra','markdown.extensions.toc', 'markdown.extensions.smarty', 'markdown.extensions.nl2br', 'markdown.extensions.urlize', 'markdown.extensions.Highlighting', 'markdown.extensions.Strikethrough', 'markdown.extensions.markdown_checklist', 'markdown.extensions.superscript', 'markdown.extensions.subscript', 'markdown.extensions.mathjax']
@@ -100,12 +100,12 @@ class RemarkableWindow(Window):
         self.text_view = GtkSource.View.new_with_buffer(self.text_buffer)
         self.text_view.set_show_line_numbers(True)
         self.text_view.set_auto_indent(True)
-        
+
         # Force the SourceView to use a SourceBuffer and not a TextBuffer
         self.lang_manager = GtkSource.LanguageManager()
         self.text_buffer.set_language(self.lang_manager.get_language('markdown'))
         self.text_buffer.set_highlight_matching_brackets(True)
-        
+
         self.undo_manager = self.text_buffer.get_undo_manager()
         self.undo_manager.connect("can-undo-changed", self.can_undo_changed)
         self.undo_manager.connect("can-redo-changed", self.can_redo_changed)
@@ -161,9 +161,9 @@ class RemarkableWindow(Window):
 
         #Check if an updated version of application exists
         _thread.start_new_thread(self.check_for_updates, ())
-        
+
         self.text_view.grab_focus()
-        
+
         if spellcheck_enabled:
             try:
                 self.spellchecker = SpellChecker(self.text_view, locale.getdefaultlocale()[0]) #Enabling spell checking
@@ -198,16 +198,16 @@ class RemarkableWindow(Window):
             os.makedirs(self.path)
         if not os.path.isfile(self.settings_path):
             self.remarkable_settings = {}
-            self.remarkable_settings['css'] = '' 
-            self.remarkable_settings['font'] = "Sans 10"  
+            self.remarkable_settings['css'] = ''
+            self.remarkable_settings['font'] = "Sans 10"
             self.remarkable_settings['line-numbers'] = True
             self.remarkable_settings['live-preview'] = True
-            self.remarkable_settings['nightmode'] = False       
+            self.remarkable_settings['nightmode'] = False
             self.remarkable_settings['statusbar'] = True
             self.remarkable_settings['style'] = "github"
             self.remarkable_settings['toolbar'] = True
             self.remarkable_settings['vertical'] = False
-            self.remarkable_settings['word-wrap'] = True                    
+            self.remarkable_settings['word-wrap'] = True
             settings_file = open(self.settings_path, 'w')
             settings_file.write(str(self.remarkable_settings))
             settings_file.close()
@@ -246,18 +246,18 @@ class RemarkableWindow(Window):
         if self.remarkable_settings['statusbar'] == False:
             # Hide the statusbar on startup
             self.on_menuitem_statusbar_activate(self)
-        
+
         # New settings, create them with default if they don't exist
         if "line-numbers" not in self.remarkable_settings:
             self.remarkable_settings['line-numbers'] = True
-                
+
         if self.remarkable_settings['line-numbers'] == False:
             # Hide line numbers on startup
             self.builder.get_object("menuitem_line_numbers").set_active(False)
 
         if "vertical" not in self.remarkable_settings:
             self.remarkable_settings['vertical'] = False
-            
+
         if self.remarkable_settings['vertical'] == True:
             # Switch to vertical layout
             self.builder.get_object("menuitem_vertical_layout").set_active(True)
@@ -268,7 +268,7 @@ class RemarkableWindow(Window):
             self.text_view.override_font(Pango.FontDescription(self.font))
         except:
             pass # Loading font failed --> leave at default font
-            
+
         # Try to load the previously chosen style. May fail if so, ignore
         try:
             self.style = self.remarkable_settings['style']
@@ -364,7 +364,7 @@ class RemarkableWindow(Window):
     def open(self, widget):
         start, end = self.text_buffer.get_bounds()
         text = self.text_buffer.get_text(start, end, False)
-        
+
         self.window.set_sensitive(False)
         chooser = Gtk.FileChooserDialog(title="Open File", action=Gtk.FileChooserAction.OPEN, buttons=(
             Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OPEN, Gtk.ResponseType.OK))
@@ -373,10 +373,10 @@ class RemarkableWindow(Window):
         if response == Gtk.ResponseType.OK:
             # The user has selected a file
             selected_file = chooser.get_filename()
-            
+
             if len(text) == 0 and not self.text_buffer.get_modified():
                 # Current file is empty. Load contents of selected file into this view
-                
+
                 self.text_buffer.begin_not_undoable_action()
                 file = open(selected_file, 'r')
                 text = file.read()
@@ -390,7 +390,7 @@ class RemarkableWindow(Window):
             else:
                 # A file is already open. Load the selected file in a new Remarkable process
                 subprocess.Popen(["remarkable", selected_file])
-        
+
         elif response == Gtk.ResponseType.CANCEL:
             # The user has clicked cancel
             pass
@@ -505,11 +505,18 @@ class RemarkableWindow(Window):
             file_name = chooser.get_filename()
             if not file_name.endswith(".html"):
                 file_name += ".html"
-            file = open(file_name, 'w')
-            soup = BeautifulSoup(html, "lxml")
-            
-            file.write(soup.prettify())
-            file.close()
+            try:
+                soup = bs4.BeautifulSoup(html, "lxml")
+                html_file = open(file_name, 'w')
+                html_file.write(soup.prettify())
+                html_file.close()
+            except (bs4.FeatureNotFound, IOError, OSError) as e:
+                dialog = Gtk.MessageDialog(self, 0, Gtk.MessageType.ERROR,
+                            Gtk.ButtonsType.OK, "Error")
+                dialog.format_secondary_text(str(e))
+                dialog.run()
+                print("Got exception:", str(e))
+                dialog.destroy()
         elif response == Gtk.ResponseType.CANCEL:
             pass
         chooser.destroy()
@@ -546,7 +553,7 @@ class RemarkableWindow(Window):
                 html_middle = markdown.markdown(text)
         html = html_middle
         self.save_pdf(html)
-        
+
     def save_pdf(self, html):
         chooser = Gtk.FileChooserDialog("Export PDF", None, Gtk.FileChooserAction.SAVE,
                                         (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
@@ -703,12 +710,12 @@ class RemarkableWindow(Window):
             text = text.upper()
             self.text_buffer.delete(start, end)
             self.text_buffer.insert_at_cursor(text)
-            
+
     def on_menuitem_join_lines_activate(self, widget):
         if self.text_buffer.get_has_selection():
             start, end = self.text_buffer.get_selection_bounds()
             self.text_buffer.join_lines(start, end)
-        
+
     def on_menuitem_sort_lines_activate(self, widget):
         if self.text_buffer.get_has_selection():
             # Sort the selected lines
@@ -728,7 +735,7 @@ class RemarkableWindow(Window):
             # No selection active, sort all lines in reverse
             start, end = self.text_buffer.get_bounds()
             self.text_buffer.sort_lines(start, end, GtkSource.SortFlags.REVERSE_ORDER, 0)
-    
+
     def on_menuitem_copy_all_activate(self, widget):
         text = self.text_buffer.get_text(self.text_buffer.get_start_iter(), self.text_buffer.get_end_iter(), False)
         try:
@@ -759,9 +766,9 @@ class RemarkableWindow(Window):
             self.paned.set_orientation(Gtk.Orientation.VERTICAL)
             self.paned.set_orientation(Gtk.Orientation.HORIZONTAL)
             self.paned.set_orientation(Gtk.Orientation.VERTICAL)
-            self.paned.set_position(self.paned.get_allocation().height/2) 
+            self.paned.set_position(self.paned.get_allocation().height/2)
             self.remarkable_settings['vertical'] = True
-        else:   
+        else:
             self.paned.set_orientation(Gtk.Orientation.HORIZONTAL)
             self.paned.set_position(self.paned.get_allocation().width/2)
             self.remarkable_settings['vertical'] = False
@@ -773,7 +780,7 @@ class RemarkableWindow(Window):
             self.remarkable_settings['word-wrap'] = True
         else:
             self.text_view.set_wrap_mode(Gtk.WrapMode.NONE)
-            self.remarkable_settings['word-wrap'] = False   
+            self.remarkable_settings['word-wrap'] = False
         self.write_settings()
 
 
@@ -785,7 +792,7 @@ class RemarkableWindow(Window):
             self.text_view.set_show_line_numbers(False)
             self.remarkable_settings['line-numbers'] = False
         self.write_settings()
-            
+
     def on_menuitem_live_preview_activate(self, widget):
         self.toggle_live_preview(self)
 
@@ -852,7 +859,7 @@ class RemarkableWindow(Window):
     def font_dialog_ok(self, widget):
         self.font = self.font_chooser.get_font_name()
         self.remarkable_settings['font'] = self.font # Save prefs
-        self.write_settings()    
+        self.write_settings()
         self.text_view.override_font(Pango.FontDescription(self.font))
 
         # Now adjust the size using TextTag
@@ -902,7 +909,7 @@ class RemarkableWindow(Window):
         html = self.default_html_start + html_middle + self.default_html_end
         tf.write(html.encode())
         tf.flush()
-        
+
         # Load the temporary HTML file in the user's default browser
         webbrowser.open_new_tab(tf_name)
 
@@ -1292,7 +1299,7 @@ class RemarkableWindow(Window):
         self.update_live_preview(self)
         self.remarkable_settings['style'] = "screen"
         self.write_settings()
-    
+
     def on_menuitem_solarized_dark_activate(self, widget):
         styles.css = styles.solarized_dark
         self.update_style(self)
@@ -1342,7 +1349,7 @@ class RemarkableWindow(Window):
 
     def on_menuitem_github_page_activate(self, widget):
         webbrowser.open_new_tab("https://github.com/jamiemcg/remarkable")
-    
+
     def on_menuitem_reportbug_activate(self, widget):
         webbrowser.open_new_tab("https://github.com/jamiemcg/remarkable/issues")
 
@@ -1396,7 +1403,7 @@ class RemarkableWindow(Window):
 
     def on_text_view_changed(self, widget):
         start, end = self.text_buffer.get_bounds()
-        
+
         if self.statusbar.get_visible():
             self.update_status_bar(self)
         else:  # statusbar not present, don't need to update/count words, etc.
