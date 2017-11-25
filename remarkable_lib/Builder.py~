@@ -84,6 +84,7 @@ class Builder(Gtk.Builder):
     def add_from_file(self, filename):
         '''parses xml file and stores wanted details'''
         #TODO
+        print("Self : {} et filename {}\n".format(self==None, filename))
         Gtk.Builder.add_from_file(self, filename)
 
         # extract data for the extra interfaces
@@ -118,35 +119,35 @@ class Builder(Gtk.Builder):
             {ele_signal.attrib["handler"]: None})
 
     def connect_signals(self, callback_obj):
-		
         '''connect the handlers defined in glade
 
         reports successful and failed connections
         and logs call to missing handlers'''
-        #filename : RemarkableWindow.py
         filename = inspect.getfile(callback_obj.__class__)
         callback_handler_dict = dict_from_callback_obj(callback_obj)
         connection_dict = {}
         connection_dict.update(self.glade_handler_dict)
         connection_dict.update(callback_handler_dict)
-        
         for item in connection_dict.items():
             if item[1] is None:
                 # the handler is missing so reroute to default_handler
-                handler = functools.partial(self.default_handler, item[0], filename)
+                handler = functools.partial(
+                    self.default_handler, item[0], filename)
 
                 connection_dict[item[0]] = handler
 
                 # replace the run time warning
-                logger.warn("expected handler '%s' in %s",item[0], filename)
+                logger.warn("expected handler '%s' in %s",
+                 item[0], filename)
+
         # connect glade define handlers
         Gtk.Builder.connect_signals(self, connection_dict)
 
         # let's tell the user how we applied the glade design
         for connection in self.connections:
             widget_name, signal_name, handler_name = connection
-            logger.debug("connect builder by design '%s', '%s', '%s'",widget_name, signal_name, handler_name)
-             
+            logger.debug("connect builder by design '%s', '%s', '%s'",
+             widget_name, signal_name, handler_name)
 
     def get_ui(self, callback_obj=None, by_name=True):
         '''Creates the ui object with widgets as attributes
@@ -236,7 +237,7 @@ def dict_from_callback_obj(callback_obj):
     methods = getmembers(callback_obj, inspect.ismethod)
 
     aliased_methods = [x[1] for x in methods if hasattr(x[1], 'aliases')]
-        
+
     # a method may have several aliases
     #~ @alias('on_btn_foo_clicked')
     #~ @alias('on_tool_foo_activate')

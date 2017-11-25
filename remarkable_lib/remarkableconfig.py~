@@ -32,7 +32,7 @@ __all__ = [
 # files). By default, this is ../data, relative your trunk layout
 
 #TODO
-__remarkable_data_directory__ = '/usr/share/remarkable/'
+__remarkable_data_directory__ = '/home/fernandes/Documents/Remarkable/'#'/usr/share/remarkable/'
 __license__ = 'MIT'
 __version__ = '1.87'
 
