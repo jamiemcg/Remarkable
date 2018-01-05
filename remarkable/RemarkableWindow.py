@@ -404,6 +404,7 @@ class RemarkableWindow(Window):
         self.window.set_sensitive(False)
         chooser = Gtk.FileChooserDialog(title="Open File", action=Gtk.FileChooserAction.OPEN, buttons=(
             Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OPEN, Gtk.ResponseType.OK))
+        self.set_file_chooser_path(chooser)
         response = chooser.run()
 
         if response == Gtk.ResponseType.OK:
@@ -476,6 +477,7 @@ class RemarkableWindow(Window):
         self.window.set_sensitive(False)
         chooser = Gtk.FileChooserDialog(title=None, action=Gtk.FileChooserAction.SAVE, buttons=(
             Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_SAVE, Gtk.ResponseType.OK))
+        self.set_file_chooser_path(chooser)
         chooser.set_do_overwrite_confirmation(True)
         title = self.name.split("/")[-1]
         chooser.set_title("Save As: " + title)
@@ -543,6 +545,7 @@ class RemarkableWindow(Window):
         chooser = Gtk.FileChooserDialog("Export HTML", None, Gtk.FileChooserAction.SAVE,
                                         (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
                                          Gtk.STOCK_OK, Gtk.ResponseType.OK))
+        self.set_file_chooser_path(chooser)
         html_filter = Gtk.FileFilter()
         html_filter.set_name("HTML Files")
         html_filter.add_pattern("*.html")
@@ -600,6 +603,7 @@ class RemarkableWindow(Window):
         chooser = Gtk.FileChooserDialog("Export PDF", None, Gtk.FileChooserAction.SAVE,
                                         (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
                                          Gtk.STOCK_OK, Gtk.ResponseType.OK))
+        self.set_file_chooser_path(chooser)
         pdf_filter = Gtk.FileFilter()
         pdf_filter.add_pattern("*.pdf")
         pdf_filter.set_name("PDF Files")
@@ -1562,3 +1566,6 @@ class RemarkableWindow(Window):
             os.remove(self.temp_file_list[0].name)
             del self.temp_file_list[0]
             i -= 1
+
+    def set_file_chooser_path(self, chooser):
+        chooser.set_current_folder(os.path.dirname(self.name))
