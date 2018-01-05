@@ -494,6 +494,11 @@ class RemarkableWindow(Window):
         chooser = Gtk.FileChooserDialog("Export HTML", None, Gtk.FileChooserAction.SAVE,
                                         (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
                                          Gtk.STOCK_OK, Gtk.ResponseType.OK))
+        chooser.set_current_folder(os.path.dirname(self.name))
+
+        filename = '{}.html'.format(os.path.splitext(os.path.basename(self.name))[0])
+        chooser.set_current_name(filename)
+
         html_filter = Gtk.FileFilter()
         html_filter.set_name("HTML Files")
         html_filter.add_pattern("*.html")
@@ -551,6 +556,12 @@ class RemarkableWindow(Window):
         chooser = Gtk.FileChooserDialog("Export PDF", None, Gtk.FileChooserAction.SAVE,
                                         (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
                                          Gtk.STOCK_OK, Gtk.ResponseType.OK))
+
+        chooser.set_current_folder(os.path.dirname(self.name))
+
+        filename = '{}.pdf'.format(os.path.splitext(os.path.basename(self.name))[0])
+        chooser.set_current_name(filename)
+
         pdf_filter = Gtk.FileFilter()
         pdf_filter.add_pattern("*.pdf")
         pdf_filter.set_name("PDF Files")
