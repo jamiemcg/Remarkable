@@ -40,7 +40,7 @@ import styles
 import unicodedata
 import warnings
 import datetime
-
+from findBar import FindBar
 
 #Check if gtkspellcheck is installed
 try:
@@ -82,7 +82,7 @@ class RemarkableWindow(Window):
         self.name = "Untitled" #Title of the current file, set to 'Untitled' as default
 
         self.default_html_start = '<!doctype HTML><html><head><meta charset="utf-8"><title>Made with Remarkable!</title><link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.1/styles/github.min.css">'
-        self.default_html_start += "<style type='text/css'>" + styles.css + "</style>"
+        self.default_html_start += "<style type='text/css'>" + styles.get() + "</style>"
         self.default_html_start += "</head><body id='MathPreviewF'>"
         self.default_html_end = '<script src="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.1/highlight.min.js"></script><script>hljs.initHighlightingOnLoad();</script><script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script><script type="text/javascript">MathJax.Hub.Config({"showProcessingMessages" : false,"messageStyle" : "none","tex2jax": { inlineMath: [ [ "$", "$" ] ] }});</script></body></html>'
         
@@ -113,10 +113,10 @@ class RemarkableWindow(Window):
         self.text_buffer.connect("changed", self.on_text_view_changed)
         self.text_view.set_buffer(self.text_buffer)
         self.text_view.set_wrap_mode(Gtk.WrapMode.WORD)
+        self.text_view.connect('key-press-event', self.cursor_ctrl_arrow_rtl_fix)
 
         self.live_preview = WebKit.WebView()
         self.live_preview.connect("console-message", self._javascript_console_message) # Suppress .js output
-        self.live_preview.zoom_out()
 
         self.scrolledwindow_text_view = Gtk.ScrolledWindow()
         self.scrolledwindow_text_view.add(self.text_view)
@@ -143,6 +143,17 @@ class RemarkableWindow(Window):
 
         text = ""
 
+        self.wrap_box = self.builder.get_object("wrap_box")
+        self.find_entry = self.builder.get_object("find_entry")
+        self.replace_entry = self.builder.get_object("replace_entry")
+        match_case = self.builder.get_object("match_case")
+        whole_word = self.builder.get_object("whole_word")
+        regex = self.builder.get_object("regex")
+        findbar = self.builder.get_object('findbar')
+        self.findbar = FindBar(findbar, self.wrap_box, self.find_entry, self.replace_entry,
+                               match_case, whole_word, regex)
+        self.findbar.set_text_view(self.text_view)
+
         #Check if filename has been specified in terminal command
         if len(sys.argv) > 1:
             self.name = sys.argv[1]
@@ -161,7 +172,7 @@ class RemarkableWindow(Window):
 
         #Check if an updated version of application exists
         _thread.start_new_thread(self.check_for_updates, ())
-        
+
         self.text_view.grab_focus()
         
         if spellcheck_enabled:
@@ -175,6 +186,21 @@ class RemarkableWindow(Window):
         self.scrolledwindow_live_preview.get_vadjustment().set_lower(1)
 
         self.temp_file_list = []
+
+    def on_find_next_button_clicked(self, widget):
+        self.findbar.on_find_next_button_clicked(widget)
+
+    def on_find_previous_button_clicked(self, widget):
+        self.findbar.on_find_previous_button_clicked(widget)
+
+    def on_find_entry_changed(self, entry):
+        self.findbar.on_find_entry_changed(entry)
+
+    def on_replace_button_clicked(self, widget):
+        self.findbar.on_replace_button_clicked(widget)
+
+    def on_replace_all_button_clicked(self, widget):
+        self.findbar.on_replace_all_button_clicked(widget)
 
     def can_redo_changed(self, widget):
         if self.text_buffer.can_redo():
@@ -207,7 +233,9 @@ class RemarkableWindow(Window):
             self.remarkable_settings['style'] = "github"
             self.remarkable_settings['toolbar'] = True
             self.remarkable_settings['vertical'] = False
-            self.remarkable_settings['word-wrap'] = True                    
+            self.remarkable_settings['word-wrap'] = True
+            self.remarkable_settings['zoom-level'] = 1
+            self.remarkable_settings['rtl'] = False
             settings_file = open(self.settings_path, 'w')
             settings_file.write(str(self.remarkable_settings))
             settings_file.close()
@@ -216,6 +244,8 @@ class RemarkableWindow(Window):
             self.remarkable_settings = eval(settings_file.read())
             settings_file.close()
             self.load_settings()
+
+        self.wrap_box.set_visible(False)
 
     def write_settings(self):
         settings_file = open(self.settings_path, 'w')
@@ -262,6 +292,12 @@ class RemarkableWindow(Window):
             # Switch to vertical layout
             self.builder.get_object("menuitem_vertical_layout").set_active(True)
 
+        if 'zoom-level' in self.remarkable_settings:
+            self.live_preview.set_zoom_level(self.remarkable_settings['zoom-level'])
+
+        if 'rtl' in self.remarkable_settings and self.remarkable_settings['rtl']:
+            self.builder.get_object("menuitem_rtl").set_active(True)
+
         # Try to load the previously chosen font, may fail as font may not exist, ect.
         try:
             self.font = self.remarkable_settings['font']
@@ -273,29 +309,29 @@ class RemarkableWindow(Window):
         try:
             self.style = self.remarkable_settings['style']
             if self.style == "dark":
-                styles.css = styles.dark
+                styles.set(styles.dark)
             elif self.style == "foghorn":
-                styles.css = styles.foghorn
+                styles.set(styles.foghorn)
             elif self.style == "github":
-                styles.css = styles.github
+                styles.set(styles.github)
             elif self.style == "handwriting_css":
-                styles.css = styles.handwriting_css
+                styles.set(styles.handwriting_css)
             elif self.style == "markdown":
-                styles.css = styles.markdown
+                styles.set(styles.markdown)
             elif self.style == "metro_vibes":
-                styles.css = styles.metro_vibes
+                styles.set(styles.metro_vibes)
             elif self.style == "metro_vibes_dark":
-                styles.css = styles.metro_vibes_dark
+                styles.set(styles.metro_vibes_dark)
             elif self.style == "modern_css":
-                styles.css = styles.modern_css
+                styles.set(styles.modern_css)
             elif self.style == "screen":
-                styles.css = styles.screen
+                styles.set(styles.screen)
             elif self.style == "solarized_dark":
-                styles.css = styles.solarized_dark
+                styles.set(styles.solarized_dark)
             elif self.style == "solarized_light":
-                styles.css = styles.solarized_light
+                styles.set(styles.solarized_light)
             elif self.style == "custom":
-                styles.css = styles.custom_css
+                styles.set(styles.custom_css)
             else:
                 print("Style key error")
 
@@ -457,6 +493,19 @@ class RemarkableWindow(Window):
             pass
         chooser.destroy()
         self.window.set_sensitive(True)
+
+    def on_menuitem_rtl_toggled(self, widget):
+        self.rtl(widget.get_active())
+        self.remarkable_settings['rtl'] = widget.get_active()
+        self.write_settings()
+
+    def rtl(self, enabled):
+        # whatever the swap choice was, it needs to be flipped now
+        self.on_menuitem_swap_activate(None)
+
+        styles.rtl(enabled)
+        self.update_style(self)
+        self.update_live_preview(self)
 
     def on_menuitem_export_html_activate(self, widget):
         self.window.set_sensitive(False)
@@ -627,15 +676,22 @@ class RemarkableWindow(Window):
 
     def on_toolbutton_zoom_in_clicked(self, widget):
         self.live_preview.zoom_in()
+        self.remarkable_settings['zoom-level'] = self.live_preview.get_zoom_level()
+        self.write_settings()
         self.scrollPreviewToFix(self)
 
     def on_toolbutton_zoom_out_clicked(self, widget):
         self.live_preview.zoom_out()
+        self.remarkable_settings['zoom-level'] = self.live_preview.get_zoom_level()
+        self.write_settings()
         self.scrollPreviewToFix(self)
 
     def redo(self, widget):
         if self.text_buffer.can_redo():
             self.text_buffer.redo()
+
+    def on_menuitem_find_activate(self, widget):
+        self.findbar.show()
 
     def on_menuitem_cut_activate(self, widget):
         if self.text_buffer.get_has_selection():
@@ -649,6 +705,8 @@ class RemarkableWindow(Window):
             start, end = self.text_buffer.get_selection_bounds()
             text = self.text_buffer.get_text(start, end, True)
             self.clipboard.set_text(text, -1)
+        elif self.live_preview.can_copy_clipboard():
+            self.live_preview.copy_clipboard()
 
     def on_menuitem_paste_activate(self, widget):
         text = self.clipboard.wait_for_text()
@@ -1225,54 +1283,53 @@ class RemarkableWindow(Window):
     # Styles
     def update_style(self, widget):
         self.default_html_start = '<!doctype HTML><html><head><meta charset="utf-8"><title>Made with Remarkable!</title><link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.1/styles/github.min.css">'
-        self.default_html_start += "<style type='text/css'>" + styles.css + "</style>"
+        self.default_html_start += "<style type='text/css'>" + styles.get() + "</style>"
         self.default_html_start += "</head><body>"
 
     def on_menuitem_dark_activate(self, widget):
-        styles.css = styles.dark
+        styles.set(styles.dark)
         self.update_style(self)
         self.update_live_preview(self)
         self.remarkable_settings['style'] = "dark"
         self.write_settings()
 
     def on_menuitem_foghorn_activate(self, widget):
-        styles.css = styles.foghorn
+        styles.set(styles.foghorn)
         self.update_style(self)
         self.update_live_preview(self)
         self.remarkable_settings['style'] = "foghorn"
         self.write_settings()
 
     def on_menuitem_github_activate(self, widget):
-        styles.css = styles.github
+        styles.set(styles.github)
         self.update_style(self)
         self.update_live_preview(self)
         self.remarkable_settings['style'] = "github"
         self.write_settings()
 
     def on_menuitem_handwritten_activate(self, widget):
-        styles.css = styles.handwriting_css
+        styles.set(styles.handwriting_css)
         self.update_style(self)
         self.update_live_preview(self)
-        self.live_preview.zoom_in()
         self.remarkable_settings['style'] = "handwriting_css"
         self.write_settings()
 
     def on_menuitem_markdown_activate(self, widget):
-        styles.css = styles.markdown
+        styles.set(styles.markdown)
         self.update_style(self)
         self.update_live_preview(self)
         self.remarkable_settings['style'] = "markdown"
         self.write_settings()
 
     def on_menuitem_metro_vibes_activate(self, widget):
-        styles.css = styles.metro_vibes
+        styles.set(styles.metro_vibes)
         self.update_style(self)
         self.update_live_preview(self)
         self.remarkable_settings['style'] = "metro_vibes"
         self.write_settings()
 
     def on_menuitem_metro_vibes_dark_activate(self, widget):
-        styles.css = styles.metro_vibes_dark
+        styles.set(styles.metro_vibes_dark)
         self.update_style(self)
         self.update_live_preview(self)
         self.remarkable_settings['style'] = "metro_vibes_dark"
@@ -1280,28 +1337,28 @@ class RemarkableWindow(Window):
 
 
     def on_menuitem_modern_activate(self, widget):
-        styles.css = styles.modern_css
+        styles.set(styles.modern_css)
         self.update_style(self)
         self.update_live_preview(self)
         self.remarkable_settings['style'] = "modern_css"
         self.write_settings()
 
     def on_menuitem_screen_activate(self, widget):
-        styles.css = styles.screen
+        styles.set(styles.screen)
         self.update_style(self)
         self.update_live_preview(self)
         self.remarkable_settings['style'] = "screen"
         self.write_settings()
     
     def on_menuitem_solarized_dark_activate(self, widget):
-        styles.css = styles.solarized_dark
+        styles.set(styles.solarized_dark)
         self.update_style(self)
         self.update_live_preview(self)
         self.remarkable_settings['style'] = "solarized_dark"
         self.write_settings()
 
     def on_menuitem_solarized_light_activate(self, widget):
-        styles.css = styles.solarized_light
+        styles.set(styles.solarized_light)
         self.update_style(self)
         self.update_live_preview(self)
         self.remarkable_settings['style'] = "solarized_light"
@@ -1331,8 +1388,8 @@ class RemarkableWindow(Window):
     def apply_custom_css(self, widget, window, tb):
         start, end = tb.get_bounds()
         self.custom_css = tb.get_text(start, end, False).replace("'", '"')
-        styles.css = self.custom_css
-        self.remarkable_settings['css'] = styles.css
+        styles.set(self.custom_css)
+        self.remarkable_settings['css'] = styles.get()
         window.hide()
         self.update_style(self)
         self.update_live_preview(self)
@@ -1414,6 +1471,46 @@ class RemarkableWindow(Window):
             if title[0] != "*":
                 title = "*" + title
                 self.window.set_title(title)
+
+    """
+        GtkTextView simply does not seem to handle visual word
+        movements correctly in bi-directional move.
+        This is a hack for going the opposite of logical order
+        in case RTL mode was selected in the editor.
+        It's not perfect, but at least for people who are mostly
+        working in RTL mode the cursor will behave as expected
+        more frequently.
+
+        The inherent bug here, of course, is that if there
+        is an English paragraph in an RTL document, the cursor
+        will go backwards on that specific paragraph.
+        This might be fixed if we look at the current
+        paragraph and infer how to act based on its type.
+        But I didn't bother for now, as this, admittedly,
+        is a double edge case: 1) RTL users; and 2) Having
+        English paragraphs and caring about Ctrl+Arrows behavior
+        in them to the point where it gets irritating.
+
+        In short, this is a quick, but useful, hack.
+    """
+    def cursor_ctrl_arrow_rtl_fix(self, widget, event):
+        if event.keyval in [Gdk.KEY_Left, Gdk.KEY_Right]:
+            if event.state & Gdk.ModifierType.CONTROL_MASK:
+                is_rtl = self.remarkable_settings['rtl']
+
+                dirs = {
+                    Gdk.KEY_Left: is_rtl and 1 or -1,
+                    Gdk.KEY_Right: is_rtl and -1 or 1,
+                }
+
+                widget.emit('move-cursor',
+                            Gtk.MovementStep.WORDS,
+                            dirs[event.keyval],
+                            event.state & Gdk.ModifierType.SHIFT_MASK != 0)
+
+                return True
+
+        return False
 
     """
         Update the text in the status bar. Displays the number of lines,
