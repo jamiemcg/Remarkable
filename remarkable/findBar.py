@@ -56,6 +56,8 @@ class FindBar(object):
             self._find_text(backwards=self.is_searching_backwards)
         elif event.keyval == Gdk.KEY_Shift_R or event.keyval == Gdk.KEY_Shift_L:
             self.is_searching_backwards = True
+        elif event.keyval == Gdk.KEY_Escape:
+            self.hide()
 
     def on_find_entry_key_release(self, widget, event):
         if event.keyval == Gdk.KEY_Shift_R or event.keyval == Gdk.KEY_Shift_L:
