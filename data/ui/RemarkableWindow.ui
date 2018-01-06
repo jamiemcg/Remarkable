@@ -261,7 +261,7 @@
                         <property name="visible">True</property>
                         <property name="sensitive">True</property>
                         <property name="can_focus">False</property>
-                        <property name="label" translatable="yes">Find</property>
+                        <property name="label" translatable="yes">Find and Replace</property>
                         <property name="use_underline">True</property>
                         <accelerator key="f" signal="activate" modifiers="GDK_CONTROL_MASK"/>
                       </object>
@@ -310,7 +310,7 @@
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="tooltip_text" translatable="yes">Convert the selected text to lowercase</property>
-                        <property name="label" translatable="yes">Convert To Lowercase</property>
+                        <property name="label" translatable="yes">Convert to Lowercase</property>
                         <property name="use_underline">True</property>
                       </object>
                     </child>
@@ -319,7 +319,7 @@
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="tooltip_text" translatable="yes">Convert the selected text to titlecase</property>
-                        <property name="label" translatable="yes">Convert To Titlecase</property>
+                        <property name="label" translatable="yes">Convert to Titlecase</property>
                         <property name="use_underline">True</property>
                       </object>
                     </child>
@@ -328,7 +328,7 @@
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="tooltip_text" translatable="yes">Convert the selected text to uppercase</property>
-                        <property name="label" translatable="yes">Convert To Uppercase</property>
+                        <property name="label" translatable="yes">Convert to Uppercase</property>
                         <property name="use_underline">True</property>
                       </object>
                     </child>
@@ -376,7 +376,7 @@
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="tooltip_text" translatable="yes">Copy all of the text to the clipboard in HTML format</property>
-                        <property name="label" translatable="yes">Copy To HTML</property>
+                        <property name="label" translatable="yes">Copy to HTML</property>
                         <property name="use_underline">True</property>
                       </object>
                     </child>
@@ -385,7 +385,7 @@
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="tooltip_text" translatable="yes">Copy the selected text to the clipboard in HTML format</property>
-                        <property name="label" translatable="yes">Copy Selection To HTML</property>
+                        <property name="label" translatable="yes">Copy Selection to HTML</property>
                         <property name="use_underline">True</property>
                       </object>
                     </child>
