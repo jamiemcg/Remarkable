@@ -1,0 +1,71 @@
+#!/usr/bin/env python3
+import os
+import platform
+import subprocess
+import sys
+
+from distutils import sysconfig
+
+
+def get_python_abiflags():
+    return sysconfig.get_config_var("ABIFLAGS")
+
+def get_python_libloc():
+    # OSX is a pain. Python as shipped by apple installs libpython in /usr/lib
+    # so we hardcode that. Other systems can use --with-libpython-dir to
+    # override this.
+    if platform.system().lower() == 'darwin':
+        return '/usr/lib'
+
+    pylib_loc = sysconfig.get_config_var("LIBPL")
+    pylib_ldlibrary = sysconfig.get_config_var("LDLIBRARY")
+
+    py_sharedlib = os.path.join(pylib_loc, pylib_ldlibrary)
+    if os.path.exists(py_sharedlib):
+        return pylib_loc
+
+    # Workaround for Fedora
+    pylib_loc = sysconfig.get_config_var("LIBDIR")
+    pylib_ldlibrary = sysconfig.get_config_var("LDLIBRARY")
+
+    py_sharedlib = os.path.join(pylib_loc, pylib_ldlibrary)
+    if os.path.exists(py_sharedlib):
+        return pylib_loc
+
+    return "None"
+
+
+if __name__ == "__main__":
+    if len(sys.argv) > 3:
+        print("At most 2 arguments accepted")
+        exit(1)
+
+    if sys.argv[1] == '--abiflags':
+        print(get_python_abiflags())
+    elif sys.argv[1] == '--sosuffix':
+        get = sysconfig.get_config_var
+        suffix = get("EXT_SUFFIX") or get("SO") or ".so"
+        print(suffix[1:])
+    elif sys.argv[1] == '--pygi-overridedir':
+        prefix = sys.argv[2]
+        version = sys.version_info
+
+        # If we are installing in the same prefix as PyGobject
+        # make sure to install in the right place.
+        import gi
+        if os.path.commonprefix([gi._overridesdir, prefix]) == prefix:
+            print(gi._overridesdir)
+            exit(0)
+
+        # Otherwise follow python's way of install site packages inside
+        # the provided prefix
+        if os.name == 'posix':
+            print(os.path.join(
+                prefix, 'lib', 'python%d.%d' % (version.major, version.minor),
+                'site-packages', 'gi', 'overrides'))
+        else:
+            print(os.path.join(
+                prefix, 'Lib', 'Python%d%d' % (version.major, version.minor),
+                'site-packages', 'gi', 'overrides'))
+    elif sys.argv[1] == '--libloc':
+        print(get_python_libloc())

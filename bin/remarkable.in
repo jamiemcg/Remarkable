@@ -27,20 +27,9 @@ import os
 import locale
 locale.textdomain('remarkable')
 
-try:
-    if os.path.exists("/usr/lib/python3/"):        
-        sys.path.append("/usr/lib/python3/dist-packages/")
-        sys.path.append("/usr/lib/python3/dist-packages/remarkable")
-    else:
-        sys.path.append("/usr/lib/python/dist-packages/")
-        sys.path.append("/usr/lib/python/dist-packages/remarkable")
-except:
-    pass
+sys.path.append("@PYTHON_LIB_PATH@")
+sys.path.append("@PYTHON_LIB_PATH@/remarkable")
 
-try:
-    sys.path.append("/usr/lib64/python3/dist-packages/")
-except:
-    pass
 
 # Add project root directory (enable symlink and trunk execution)
 PROJECT_ROOT_DIRECTORY = os.path.abspath(

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop">
+  <id>remarkable.desktop</id>
+  <metadata_license>CC-BY-3.0</metadata_license>
+  <project_license>MIT</project_license>
+  <name>Remarkable Markdown Editor</name>
+  <summary>Remarkable is a powerful markdown editor available for Linux. It is fully featured and customizable.</summary>
+  <description>
+    <p>
+Remarkable is a full featured and powerful markdown editor that allows you to quickly edit and work with documents in markdown format.
+    </p>
+  </description>
+  <screenshots>
+    <screenshot type="default">
+      <image>https://remarkableapp.github.io/images/main_screenshot.png</image>
+    </screenshot>
+  </screenshots>
+  <url type="homepage">https://remarkableapp.github.io</url>
+  <url type="bugtracker">https://github.com/jamiemcg/Remarkable/issues</url>
+  <url type="donation">https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=B5PJTSJNFYGT2</url>
+  <project_group>GNOME</project_group>
+  <update_contact>Jamie McGowan - jamiemcgowan.dev@gmail.com</update_contact>
+  <translation>None</translation>
+</component>
