@@ -28,16 +28,12 @@ gi.require_version('WebKit', '3.0')
 
 from bs4 import BeautifulSoup
 from gi.repository import Gdk, Gtk, GtkSource, Pango, WebKit
-from locale import gettext as _
 from urllib.request import urlopen
 import markdown
-import os
 import pdfkit
-import re, subprocess, datetime, os, webbrowser, _thread, sys, locale
+import re, subprocess, os, webbrowser, _thread, sys, locale
 import tempfile
-import traceback
 import styles
-import unicodedata
 import warnings
 import datetime
 from findBar import FindBar
