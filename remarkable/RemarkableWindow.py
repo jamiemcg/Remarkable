@@ -1207,6 +1207,9 @@ class RemarkableWindow(Window):
 
         insertTableDialog.dispose()
 
+    def on_btn_closeFindBar_clicked(self, widget):
+        self.findbar.hide()
+
     def on_toolbutton_image_clicked(self, widget):
         self.insert_image(self)
 

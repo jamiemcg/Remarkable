@@ -30,7 +30,7 @@ __all__ = [
 
 # Where your project will look for your data
 #(for instance, images and ui files).
-__remarkable_data_directories__ = ['../data', '/home/sven/git/sven/Remarkable/', '/usr/share/remarkable']
+__remarkable_data_directories__ = ['../data', '/usr/share/remarkable']
 __license__ = 'MIT'
 __version__ = '1.87'
 

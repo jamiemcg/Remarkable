@@ -1239,10 +1239,10 @@
             <property name="no_show_all">True</property>
             <property name="column_spacing">6</property>
             <child>
-              <object class="GtkHButtonBox" id="hbuttonbox2">
+                <object class="GtkButtonBox" id="hbuttonbox2">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="layout_style">start</property>
+                    <property name="homogeneous">True</property>
                 <child>
                   <object class="GtkButton" id="replace_button">
                     <property name="label" translatable="yes">_Replace</property>
@@ -1284,7 +1284,7 @@
               </packing>
             </child>
             <child>
-              <object class="GtkHButtonBox" id="hbuttonbox1">
+                <object class="GtkButtonBox" id="hbuttonbox1">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="layout_style">start</property>
@@ -1345,14 +1345,13 @@
               </packing>
             </child>
             <child>
-              <object class="GtkSearchEntry" id="find_entry">
+                <object class="GtkEntry" id="find_entry">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="width_chars">32</property>
                 <property name="shadow_type">etched-in</property>
                 <property name="primary_icon_activatable">False</property>
                 <property name="secondary_icon_activatable">False</property>
-                <signal name="search-changed" handler="on_find_entry_changed" swapped="no"/>
                 <accelerator key="f" signal="grab-focus" modifiers="GDK_CONTROL_MASK"/>
               </object>
               <packing>
@@ -1388,7 +1387,7 @@
               </packing>
             </child>
             <child>
-              <object class="GtkHBox" id="find_options">
+                <object class="GtkBox" id="find_options">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="spacing">6</property>
@@ -1400,7 +1399,6 @@
                     <property name="focus_on_click">False</property>
                     <property name="receives_default">False</property>
                     <property name="use_underline">True</property>
-                    <property name="xalign">0</property>
                     <property name="draw_indicator">True</property>
                   </object>
                   <packing>
@@ -1417,7 +1415,6 @@
                     <property name="focus_on_click">False</property>
                     <property name="receives_default">False</property>
                     <property name="use_underline">True</property>
-                    <property name="xalign">0</property>
                     <property name="draw_indicator">True</property>
                   </object>
                   <packing>
@@ -1434,7 +1431,6 @@
                     <property name="focus_on_click">False</property>
                     <property name="receives_default">False</property>
                     <property name="use_underline">True</property>
-                    <property name="xalign">0</property>
                     <property name="draw_indicator">True</property>
                   </object>
                   <packing>
@@ -1450,7 +1446,7 @@
               </packing>
             </child>
             <child>
-              <object class="GtkHBox" id="wrap_box">
+                <object class="GtkBox" id="wrap_box">
                 <property name="can_focus">False</property>
                 <property name="spacing">6</property>
                 <child>
@@ -1486,7 +1482,31 @@
               </packing>
             </child>
             <child>
-              <placeholder/>
+                <object class="GtkButtonBox" id="box_closeBtn">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="layout_style">start</property>
+                    <child>
+                        <object class="GtkButton" id="btn_closeFindBar">
+                            <property name="label">gtk-close</property>
+                            <property name="visible">True</property>
+                            <property name="can_focus">True</property>
+                            <property name="receives_default">True</property>
+                            <property name="relief">half</property>
+                            <property name="use_stock">True</property>
+                            <property name="image_position">right</property>
+                        </object>
+                        <packing>
+                            <property name="expand">False</property>
+                            <property name="fill">True</property>
+                            <property name="position">0</property>
+                        </packing>
+                    </child>
+                </object>
+                <packing>
+                    <property name="left_attach">3</property>
+                    <property name="top_attach">1</property>
+                </packing>
             </child>
             <child>
               <placeholder/>
@@ -1515,8 +1535,5 @@
         </child>
       </object>
     </child>
-  </object>
-  <object class="GtkRadioAction" id="radioaction1">
-    <property name="draw_as_radio">True</property>
   </object>
 </interface>
