@@ -89,7 +89,7 @@ class Builder(Gtk.Builder):
         tree = ElementTree()
         tree.parse(filename)
 
-        ele_widgets = tree.getiterator("object")
+        ele_widgets = tree.iter("object")
         for ele_widget in ele_widgets:
             name = ele_widget.attrib['id']
             widget = self.get_object(name)
@@ -135,7 +135,7 @@ class Builder(Gtk.Builder):
                 connection_dict[item[0]] = handler
 
                 # replace the run time warning
-                logger.warn("expected handler '%s' in %s",
+                logger.warning("expected handler '%s' in %s",
                  item[0], filename)
 
         # connect glade define handlers

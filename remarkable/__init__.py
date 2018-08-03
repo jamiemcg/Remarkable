@@ -51,3 +51,10 @@ def main():
     window.show_all()
     window.check_settings() # Load settings after app displayed to fix bugs!
     Gtk.main()
+#
+
+if __name__ == '__main__':
+    '''We need something that's working to debug
+    
+    '''
+    main()
