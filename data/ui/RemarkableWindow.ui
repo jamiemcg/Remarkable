@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Generated with glade 3.18.3 -->
+<!-- Generated with glade 3.22.1 -->
 <interface>
   <requires lib="gtk+" version="3.0"/>
   <requires lib="remarkable_window" version="1.0"/>
@@ -85,6 +85,9 @@
     <property name="default_width">1024</property>
     <property name="default_height">640</property>
     <property name="icon">remarkable.png</property>
+    <child>
+      <placeholder/>
+    </child>
     <child>
       <object class="GtkBox" id="box">
         <property name="visible">True</property>
@@ -259,7 +262,6 @@
                     <child>
                       <object class="GtkMenuItem" id="menuitem_find">
                         <property name="visible">True</property>
-                        <property name="sensitive">True</property>
                         <property name="can_focus">False</property>
                         <property name="label" translatable="yes">Find and Replace</property>
                         <property name="use_underline">True</property>
@@ -732,6 +734,14 @@
                         <property name="label" translatable="yes">Insert Timestamp</property>
                         <property name="use_underline">True</property>
                         <accelerator key="t" signal="activate" modifiers="GDK_CONTROL_MASK"/>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkMenuItem" id="menuitem_insertTable">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="label" translatable="yes">Insert Table</property>
+                        <property name="use_underline">True</property>
                       </object>
                     </child>
                   </object>
@@ -1229,19 +1239,19 @@
             <property name="no_show_all">True</property>
             <property name="column_spacing">6</property>
             <child>
-              <object class="GtkHButtonBox" id="hbuttonbox2">
+                <object class="GtkButtonBox" id="hbuttonbox2">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="layout_style">start</property>
+                    <property name="homogeneous">True</property>
                 <child>
                   <object class="GtkButton" id="replace_button">
                     <property name="label" translatable="yes">_Replace</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
+                    <property name="focus_on_click">False</property>
                     <property name="receives_default">True</property>
                     <property name="relief">none</property>
                     <property name="use_underline">True</property>
-                    <property name="focus_on_click">False</property>
                     <signal name="clicked" handler="on_replace_button_clicked" swapped="no"/>
                   </object>
                   <packing>
@@ -1255,10 +1265,10 @@
                     <property name="label" translatable="yes">Replace _All</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
+                    <property name="focus_on_click">False</property>
                     <property name="receives_default">True</property>
                     <property name="relief">none</property>
                     <property name="use_underline">True</property>
-                    <property name="focus_on_click">False</property>
                     <signal name="clicked" handler="on_replace_all_button_clicked" swapped="no"/>
                   </object>
                   <packing>
@@ -1274,7 +1284,7 @@
               </packing>
             </child>
             <child>
-              <object class="GtkHButtonBox" id="hbuttonbox1">
+                <object class="GtkButtonBox" id="hbuttonbox1">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="layout_style">start</property>
@@ -1283,11 +1293,11 @@
                     <property name="label" translatable="yes">_Previous</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
+                    <property name="focus_on_click">False</property>
                     <property name="receives_default">True</property>
                     <property name="image">arrow_left</property>
                     <property name="relief">none</property>
                     <property name="use_underline">True</property>
-                    <property name="focus_on_click">False</property>
                     <signal name="clicked" handler="on_find_previous_button_clicked" swapped="no"/>
                   </object>
                   <packing>
@@ -1301,11 +1311,11 @@
                     <property name="label" translatable="yes">_Next</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
+                    <property name="focus_on_click">False</property>
                     <property name="receives_default">True</property>
                     <property name="image">arrow_right</property>
                     <property name="relief">none</property>
                     <property name="use_underline">True</property>
-                    <property name="focus_on_click">False</property>
                     <signal name="clicked" handler="on_find_next_button_clicked" swapped="no"/>
                   </object>
                   <packing>
@@ -1324,10 +1334,10 @@
               <object class="GtkLabel" id="find_label">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="xalign">0</property>
                 <property name="label" translatable="yes">Find:</property>
                 <property name="use_underline">True</property>
                 <property name="mnemonic_widget">find_entry</property>
+                <property name="xalign">0</property>
               </object>
               <packing>
                 <property name="left_attach">0</property>
@@ -1335,14 +1345,13 @@
               </packing>
             </child>
             <child>
-              <object class="GtkSearchEntry" id="find_entry">
+                <object class="GtkEntry" id="find_entry">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="width_chars">32</property>
                 <property name="shadow_type">etched-in</property>
                 <property name="primary_icon_activatable">False</property>
                 <property name="secondary_icon_activatable">False</property>
-                <signal name="search-changed" handler="on_find_entry_changed" swapped="no"/>
                 <accelerator key="f" signal="grab-focus" modifiers="GDK_CONTROL_MASK"/>
               </object>
               <packing>
@@ -1354,10 +1363,10 @@
               <object class="GtkLabel" id="replace_label">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="xalign">0</property>
                 <property name="label" translatable="yes">Replace _with:</property>
                 <property name="use_underline">True</property>
                 <property name="mnemonic_widget">replace_entry</property>
+                <property name="xalign">0</property>
               </object>
               <packing>
                 <property name="left_attach">0</property>
@@ -1378,7 +1387,7 @@
               </packing>
             </child>
             <child>
-              <object class="GtkHBox" id="find_options">
+                <object class="GtkBox" id="find_options">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="spacing">6</property>
@@ -1387,10 +1396,9 @@
                     <property name="label" translatable="yes">_Match case</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
+                    <property name="focus_on_click">False</property>
                     <property name="receives_default">False</property>
                     <property name="use_underline">True</property>
-                    <property name="focus_on_click">False</property>
-                    <property name="xalign">0</property>
                     <property name="draw_indicator">True</property>
                   </object>
                   <packing>
@@ -1404,10 +1412,9 @@
                     <property name="label" translatable="yes">Who_le word</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
+                    <property name="focus_on_click">False</property>
                     <property name="receives_default">False</property>
                     <property name="use_underline">True</property>
-                    <property name="focus_on_click">False</property>
-                    <property name="xalign">0</property>
                     <property name="draw_indicator">True</property>
                   </object>
                   <packing>
@@ -1421,10 +1428,9 @@
                     <property name="label" translatable="yes">Regular e_xpression</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
+                    <property name="focus_on_click">False</property>
                     <property name="receives_default">False</property>
                     <property name="use_underline">True</property>
-                    <property name="focus_on_click">False</property>
-                    <property name="xalign">0</property>
                     <property name="draw_indicator">True</property>
                   </object>
                   <packing>
@@ -1440,7 +1446,7 @@
               </packing>
             </child>
             <child>
-              <object class="GtkHBox" id="wrap_box">
+                <object class="GtkBox" id="wrap_box">
                 <property name="can_focus">False</property>
                 <property name="spacing">6</property>
                 <child>
@@ -1459,9 +1465,9 @@
                   <object class="GtkLabel" id="wrap_label">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="xalign">0</property>
                     <property name="label" translatable="yes">Wrapped</property>
                     <property name="use_underline">True</property>
+                    <property name="xalign">0</property>
                   </object>
                   <packing>
                     <property name="expand">False</property>
@@ -1476,7 +1482,31 @@
               </packing>
             </child>
             <child>
-              <placeholder/>
+                <object class="GtkButtonBox" id="box_closeBtn">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="layout_style">start</property>
+                    <child>
+                        <object class="GtkButton" id="btn_closeFindBar">
+                            <property name="label">gtk-close</property>
+                            <property name="visible">True</property>
+                            <property name="can_focus">True</property>
+                            <property name="receives_default">True</property>
+                            <property name="relief">half</property>
+                            <property name="use_stock">True</property>
+                            <property name="image_position">right</property>
+                        </object>
+                        <packing>
+                            <property name="expand">False</property>
+                            <property name="fill">True</property>
+                            <property name="position">0</property>
+                        </packing>
+                    </child>
+                </object>
+                <packing>
+                    <property name="left_attach">3</property>
+                    <property name="top_attach">1</property>
+                </packing>
             </child>
             <child>
               <placeholder/>
@@ -1505,8 +1535,5 @@
         </child>
       </object>
     </child>
-  </object>
-  <object class="GtkRadioAction" id="radioaction1">
-    <property name="draw_as_radio">True</property>
   </object>
 </interface>

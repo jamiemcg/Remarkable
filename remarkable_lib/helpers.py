@@ -31,6 +31,9 @@ from . Builder import Builder
 
 from locale import gettext as _
 
+logger = None
+lib_logger = None
+
 def get_builder(builder_file_name):
     """Return a fully-instantiated Gtk.Builder instance from specified ui 
     file
@@ -64,8 +67,8 @@ class NullHandler(logging.Handler):
 def set_up_logging(opts):
     # add a handler to prevent basicConfig
     root = logging.getLogger()
-    null_handler = NullHandler()
-    root.addHandler(null_handler)
+    #null_handler = NullHandler()
+    #root.addHandler(null_handler)
 
     formatter = logging.Formatter("%(levelname)s:%(name)s: %(funcName)s() '%(message)s'")
 
@@ -86,12 +89,8 @@ def set_up_logging(opts):
         if opts.verbose > 1:
             lib_logger.setLevel(logging.DEBUG)
 
-    """# Set the logging level to show debug messages.
-    if opts.verbose:
-        logger.setLevel(logging.DEBUG)
-        logger.debug('logging enabled')
-    if opts.verbose > 1:
-        lib_logger.setLevel(logging.DEBUG)"""
+    logger.setLevel(logging.DEBUG)
+
 
 def get_help_uri(page=None):
     # help_uri from source tree - default language
