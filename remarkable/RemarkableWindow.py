@@ -444,6 +444,7 @@ class RemarkableWindow(Window):
                                        Gtk.MessageType.QUESTION, Gtk.ButtonsType.YES_NO,
                                        message)
             dialog.set_title("Save?")
+            dialog.set_default_response(Gtk.ResponseType.YES)
 
             if dialog.run() == Gtk.ResponseType.NO:
                 reply = False
