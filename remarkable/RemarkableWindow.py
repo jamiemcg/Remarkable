@@ -32,6 +32,7 @@ from locale import gettext as _
 from urllib.request import urlopen
 import markdown
 import os
+import sys
 import pdfkit
 import re, subprocess, datetime, os, webbrowser, _thread, sys, locale
 import tempfile
@@ -386,7 +387,7 @@ class RemarkableWindow(Window):
         Launches a new instance of Remarkable
     """
     def new(self, widget):
-        subprocess.Popen("remarkable")
+        subprocess.Popen(sys.argv[0])
 
     def on_menuitem_open_activate(self, widget):
         self.open(self)
@@ -426,7 +427,7 @@ class RemarkableWindow(Window):
                 self.text_buffer.end_not_undoable_action()
             else:
                 # A file is already open. Load the selected file in a new Remarkable process
-                subprocess.Popen(["remarkable", selected_file])
+                subprocess.Popen([sys.argv[0], selected_file])
         
         elif response == Gtk.ResponseType.CANCEL:
             # The user has clicked cancel
@@ -1425,7 +1426,7 @@ class RemarkableWindow(Window):
 
     def on_menuitem_markdown_tutorial_activate(self, widget):
         tutorial_path = self.media_path  + "MarkdownTutorial.md"
-        subprocess.Popen(["remarkable", tutorial_path])
+        subprocess.Popen([sys.argv[0], tutorial_path])
 
     def on_menuitem_homepage_activate(self, widget):
         webbrowser.open_new_tab("http://remarkableapp.github.io")
