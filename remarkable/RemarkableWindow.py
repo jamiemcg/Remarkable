@@ -24,10 +24,10 @@
 import gi
 gi.require_version('Gtk', '3.0')
 gi.require_version('GtkSource', '3.0')
-gi.require_version('WebKit', '3.0')
+gi.require_version('WebKit2', '4.0')
 
 from bs4 import BeautifulSoup
-from gi.repository import Gdk, Gtk, GtkSource, Pango, WebKit
+from gi.repository import Gdk, Gtk, GtkSource, Pango, WebKit2
 from locale import gettext as _
 from urllib.request import urlopen
 import markdown
@@ -116,8 +116,8 @@ class RemarkableWindow(Window):
         self.text_view.set_wrap_mode(Gtk.WrapMode.WORD)
         self.text_view.connect('key-press-event', self.cursor_ctrl_arrow_rtl_fix)
 
-        self.live_preview = WebKit.WebView()
-        self.live_preview.connect("console-message", self._javascript_console_message) # Suppress .js output
+        self.live_preview = WebKit2.WebView()
+        #self.live_preview.connect("console-message", self._javascript_console_message) # Suppress .js output
 
         self.scrolledwindow_text_view = Gtk.ScrolledWindow()
         self.scrolledwindow_text_view.add(self.text_view)
@@ -1549,7 +1549,7 @@ class RemarkableWindow(Window):
         html = self.default_html_start + html_middle + self.default_html_end
 
         # Update the display, supporting relative paths to local images
-        self.live_preview.load_string(html, "text/html", "utf-8", "file://{}".format(os.path.abspath(self.name)))
+        self.live_preview.load_html(html, "file://{}".format(os.path.abspath(self.name)))
 
     """
         This function suppresses the messages from the WebKit (live preview) console
