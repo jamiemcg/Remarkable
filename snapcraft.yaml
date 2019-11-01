@@ -31,7 +31,7 @@ parts:
       - libqt5sensors5
       - libqt5webchannel5
       - libqt5positioning5
-      - gir1.2-webkit-3.0
+      - gir1.2-webkit2-4.0
       - gir1.2-gtksource-3.0
       - python3-gtkspellcheck
 apps:
