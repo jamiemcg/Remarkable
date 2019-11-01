@@ -75,6 +75,7 @@ class RemarkableWindow(Window):
 
         self.is_fullscreen = False
         self.editor_position = 0
+        self.zoom_steps = 0.1
         self.homeDir = os.environ['HOME']
         self.path = os.path.join(self.homeDir, ".remarkable/")
         self.settings_path = os.path.join(self.path, "remarkable.settings")
@@ -680,13 +681,13 @@ class RemarkableWindow(Window):
         self.redo(self)
 
     def on_toolbutton_zoom_in_clicked(self, widget):
-        self.live_preview.zoom_in()
+        self.live_preview.set_zoom_level((1+self.zoom_steps)*self.live_preview.get_zoom_level())
         self.remarkable_settings['zoom-level'] = self.live_preview.get_zoom_level()
         self.write_settings()
         self.scrollPreviewToFix(self)
 
     def on_toolbutton_zoom_out_clicked(self, widget):
-        self.live_preview.zoom_out()
+        self.live_preview.set_zoom_level((1-self.zoom_steps)*self.live_preview.get_zoom_level())
         self.remarkable_settings['zoom-level'] = self.live_preview.get_zoom_level()
         self.write_settings()
         self.scrollPreviewToFix(self)
