@@ -711,8 +711,12 @@ class RemarkableWindow(Window):
             start, end = self.text_buffer.get_selection_bounds()
             text = self.text_buffer.get_text(start, end, True)
             self.clipboard.set_text(text, -1)
-        elif self.live_preview.can_copy_clipboard():
-            self.live_preview.copy_clipboard()
+        else:
+            self.live_preview.can_execute_editing_command(WebKit2.EDITING_COMMAND_COPY, None, self.execute_copy_command, None)
+
+    def execute_copy_command(self, source, result, user_data):
+        if self.live_preview.can_execute_editing_command_finish(result):
+            self.live_preview.execute_editing_command(WebKit2.EDITING_COMMAND_COPY)
 
     def on_menuitem_paste_activate(self, widget):
         text = self.clipboard.wait_for_text()
