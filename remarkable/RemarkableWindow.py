@@ -1431,7 +1431,7 @@ class RemarkableWindow(Window):
         self.AboutDialog.show(self)
 
     def on_menuitem_markdown_tutorial_activate(self, widget):
-        tutorial_path = self.media_path  + "MarkdownTutorial.md"
+        tutorial_path = self.media_path + "MarkdownTutorial.md"
         subprocess.Popen([sys.argv[0], tutorial_path])
 
     def on_menuitem_homepage_activate(self, widget):
