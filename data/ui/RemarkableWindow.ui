@@ -881,14 +881,6 @@
                       </object>
                     </child>
                     <child>
-                      <object class="GtkMenuItem" id="menuitem_feedback">
-                        <property name="visible">True</property>
-                        <property name="can_focus">False</property>
-                        <property name="label" translatable="yes">Submit Feedback</property>
-                        <property name="use_underline">True</property>
-                      </object>
-                    </child>
-                    <child>
                       <object class="GtkSeparatorMenuItem" id="menuitem_help_sep1">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>

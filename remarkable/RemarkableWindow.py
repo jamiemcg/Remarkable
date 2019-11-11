@@ -1,7 +1,7 @@
 #!usr/bin/python3
 # -*- Mode: Python; coding: utf-8; indent-tabs-mode: nil; tab-width: 4 -*-
 ### BEGIN LICENSE
-# Copyright (C) 2016 <Jamie McGowan> <jamiemcgowan.dev@gmail.com>
+# Copyright (C) 2019 <Jamie McGowan> <jamiemcgowan.dev@gmail.com>
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
 # in the Software without restriction, including without limitation the rights
@@ -32,7 +32,6 @@ from locale import gettext as _
 from urllib.request import urlopen
 import markdown
 import os
-import sys
 import pdfkit
 import re, subprocess, datetime, os, webbrowser, _thread, sys, locale
 import tempfile
@@ -40,7 +39,6 @@ import traceback
 import styles
 import unicodedata
 import warnings
-import datetime
 from findBar import FindBar
 
 #Check if gtkspellcheck is installed
@@ -74,8 +72,8 @@ class RemarkableWindow(Window):
         self.settings = Gtk.Settings.get_default()
 
         self.is_fullscreen = False
-        self.editor_position = 0
         self.zoom_steps = 0.1
+        self.editor_position = 0
         self.homeDir = os.environ['HOME']
         self.path = os.path.join(self.homeDir, ".remarkable/")
         self.settings_path = os.path.join(self.path, "remarkable.settings")
@@ -118,7 +116,6 @@ class RemarkableWindow(Window):
         self.text_view.connect('key-press-event', self.cursor_ctrl_arrow_rtl_fix)
 
         self.live_preview = WebKit2.WebView()
-        #self.live_preview.connect("console-message", self._javascript_console_message) # Suppress .js output
 
         self.scrolledwindow_text_view = Gtk.ScrolledWindow()
         self.scrolledwindow_text_view.add(self.text_view)
@@ -446,6 +443,7 @@ class RemarkableWindow(Window):
                                        Gtk.MessageType.QUESTION, Gtk.ButtonsType.YES_NO,
                                        message)
             dialog.set_title("Save?")
+            dialog.set_default_response(Gtk.ResponseType.YES)
 
             if dialog.run() == Gtk.ResponseType.NO:
                 reply = False
@@ -1140,29 +1138,45 @@ class RemarkableWindow(Window):
             start_iter = self.text_buffer.get_iter_at_line(line_number)
             self.text_buffer.insert(start_iter, "- ")
 
-    def on_menuitem_heading_1_activate(self, widget):
+    def add_heading(self, heading_size):
+        # Get iters for start and end of line at cursor
         temp_iter = self.text_buffer.get_iter_at_mark(self.text_buffer.get_insert())
         line_number = temp_iter.get_line()
         start_iter = self.text_buffer.get_iter_at_line(line_number)
-        self.text_buffer.insert(start_iter, "#")
+        end_iter = self.text_buffer.get_iter_at_line(line_number)
+        end_iter.forward_to_line_end()
+
+        # Get the text on the current line and check if there is already a heading
+        text = self.text_buffer.get_text(start_iter, end_iter, True)
+
+        if len(text) == 0:
+            # This line is empty, add the #'s
+            text = ("#") * heading_size + " "
+        
+        elif text.lstrip()[0] == "#":
+            # This line is already a heading. Remove #'s and replace with new #'s
+            # Issue, this uses lstrip() to remove whitespace, which user may wish to preserve
+            text_without_heading = "".join(re.split("^#+", text)).lstrip()
+            text = ("#" * heading_size) + " " + text_without_heading
+        else:
+            # This line doesn't already have a heading, simple prepend #'s
+            text = ("#" * heading_size) + " " + text
+
+        # Replace text with new heading character(s)
+        self.text_buffer.delete(start_iter, end_iter)
+        self.text_buffer.insert(start_iter, text)
+
+    def on_menuitem_heading_1_activate(self, widget):
+        self.add_heading(1)
 
     def on_menuitem_heading_2_activate(self, widget):
-        temp_iter = self.text_buffer.get_iter_at_mark(self.text_buffer.get_insert())
-        line_number = temp_iter.get_line()
-        start_iter = self.text_buffer.get_iter_at_line(line_number)
-        self.text_buffer.insert(start_iter, "##")
+        self.add_heading(2)
 
     def on_menuitem_heading_3_activate(self, widget):
-        temp_iter = self.text_buffer.get_iter_at_mark(self.text_buffer.get_insert())
-        line_number = temp_iter.get_line()
-        start_iter = self.text_buffer.get_iter_at_line(line_number)
-        self.text_buffer.insert(start_iter, "###")
+        self.add_heading(3)
 
     def on_menuitem_heading_4_activate(self, widget):
-        temp_iter = self.text_buffer.get_iter_at_mark(self.text_buffer.get_insert())
-        line_number = temp_iter.get_line()
-        start_iter = self.text_buffer.get_iter_at_line(line_number)
-        self.text_buffer.insert(start_iter, "####")
+        self.add_heading(4)
 
     def on_menuitem_horizonatal_rule_activate(self, widget):
         if not self.text_buffer.get_has_selection():
@@ -1413,25 +1427,12 @@ class RemarkableWindow(Window):
     def on_menuitem_reportbug_activate(self, widget):
         webbrowser.open_new_tab("https://github.com/jamiemcg/remarkable/issues")
 
-    def on_menuitem_feedback_activate(self, widget):
-        window_feedback = Gtk.Window()
-        window_feedback.set_title("Feedback Form")
-        window_feedback.set_default_size(640, 640)
-        window_feedback.set_position(Gtk.WindowPosition.CENTER)
-        feedback_browser = WebKit.WebView()
-        feedback_browser.connect("console-message", self._javascript_console_message) # Suppress .js output
-        feedback_scroller = Gtk.ScrolledWindow()
-        feedback_scroller.add(feedback_browser)
-        window_feedback.add(feedback_scroller)
-        feedback_browser.open("https://jamiemcgowan.typeform.com/to/ng5Lhc")
-        window_feedback.show_all()
-
     def on_menuitem_about_activate(self, widget):
         self.AboutDialog.show(self)
 
     def on_menuitem_markdown_tutorial_activate(self, widget):
         tutorial_path = self.media_path  + "MarkdownTutorial.md"
-        subprocess.Popen([sys.argv[0], tutorial_path])
+        subprocess.Popen([sus.argv[0], tutorial_path])
 
     def on_menuitem_homepage_activate(self, widget):
         webbrowser.open_new_tab("http://remarkableapp.github.io")
