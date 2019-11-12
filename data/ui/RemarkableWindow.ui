@@ -472,6 +472,30 @@
                       </object>
                     </child>
                     <child>
+                      <object class="GtkSeparatorMenuItem" id="menuitem_sep_view">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkMenuItem" id="menuitem_zoom_in">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="label" translatable="yes">Zoom In</property>
+                        <property name="use_underline">True</property>
+                        <accelerator key="plus" signal="activate" modifiers="GDK_CONTROL_MASK"/>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkMenuItem" id="menuitem_zoom_out">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="label" translatable="yes">Zoom Out</property>
+                        <property name="use_underline">True</property>
+                        <accelerator key="minus" signal="activate" modifiers="GDK_CONTROL_MASK"/>
+                      </object>
+                    </child>
+                    <child>
                       <object class="GtkSeparatorMenuItem" id="menuitem_sep_last">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
@@ -586,7 +610,6 @@
                         <property name="can_focus">False</property>
                         <property name="label" translatable="yes">Subscript</property>
                         <property name="use_underline">True</property>
-                        <accelerator key="equal" signal="activate" modifiers="GDK_CONTROL_MASK"/>
                       </object>
                     </child>
                     <child>
@@ -595,7 +618,7 @@
                         <property name="can_focus">False</property>
                         <property name="label" translatable="yes">Superscript</property>
                         <property name="use_underline">True</property>
-                        <accelerator key="plus" signal="activate" modifiers="GDK_CONTROL_MASK"/>
+                        
                       </object>
                     </child>
                     <child>
@@ -887,7 +910,7 @@
                       </object>
                     </child>
                     <child>
-                      <object class="GtkMenuItem" id="menuitem_markdown_tutorial">
+                      <object class="GtkMenuItem" id="markdown_tutorial">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="label" translatable="yes">Markdown Tutorial</property>
@@ -1175,6 +1198,7 @@
                     <property name="label" translatable="yes">Zoom In</property>
                     <property name="use_underline">True</property>
                     <property name="icon_widget">image_zoom_in</property>
+                    <accelerator key="equal" signal="clicked" modifiers="GDK_CONTROL_MASK"/>
                   </object>
                   <packing>
                     <property name="expand">True</property>

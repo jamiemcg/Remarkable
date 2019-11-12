@@ -78,14 +78,12 @@ class RemarkableWindow(Window):
         self.path = os.path.join(self.homeDir, ".remarkable/")
         self.settings_path = os.path.join(self.path, "remarkable.settings")
         self.media_path = remarkableconfig.get_data_path() + os.path.sep + "media" + os.path.sep
-        
         self.name = "Untitled" #Title of the current file, set to 'Untitled' as default
 
-        self.default_html_start = '<!doctype HTML><html><head><meta charset="utf-8"><title>Made with Remarkable!</title><link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.1/styles/github.min.css">'
+        self.default_html_start = '<!doctype HTML><html><head><meta charset="utf-8"><title>Made with Remarkable!</title><link rel="stylesheet" href="' + self.media_path + 'highlightjs.default.min.css">'
         self.default_html_start += "<style type='text/css'>" + styles.get() + "</style>"
         self.default_html_start += "</head><body id='MathPreviewF'>"
-        self.default_html_end = '<script src="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.1/highlight.min.js"></script><script>hljs.initHighlightingOnLoad();</script><script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script><script type="text/javascript">MathJax.Hub.Config({"showProcessingMessages" : false,"messageStyle" : "none","tex2jax": { inlineMath: [ [ "$", "$" ] ] }});</script></body></html>'
-        
+        self.default_html_end = '<script src="' + self.media_path + 'highlight.min.js"></script><script>hljs.initHighlightingOnLoad();</script><script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script><script type="text/javascript">MathJax.Hub.Config({"showProcessingMessages" : false,"messageStyle" : "none","tex2jax": { inlineMath: [ [ "$", "$" ] ] }});</script></body></html>'
         self.remarkable_settings = {}
 
         self.default_extensions = ['markdown.extensions.extra','markdown.extensions.toc', 'markdown.extensions.smarty', 'markdown.extensions.nl2br', 'markdown.extensions.urlize', 'markdown.extensions.Highlighting', 'markdown.extensions.Strikethrough', 'markdown.extensions.markdown_checklist', 'markdown.extensions.superscript', 'markdown.extensions.subscript', 'markdown.extensions.mathjax']
@@ -678,17 +676,23 @@ class RemarkableWindow(Window):
     def on_toolbutton_redo_clicked(self, widget):
         self.redo(self)
 
-    def on_toolbutton_zoom_in_clicked(self, widget):
+    def zoom_in(self):
         self.live_preview.set_zoom_level((1+self.zoom_steps)*self.live_preview.get_zoom_level())
         self.remarkable_settings['zoom-level'] = self.live_preview.get_zoom_level()
         self.write_settings()
         self.scrollPreviewToFix(self)
 
-    def on_toolbutton_zoom_out_clicked(self, widget):
+    def zoom_out(self):
         self.live_preview.set_zoom_level((1-self.zoom_steps)*self.live_preview.get_zoom_level())
         self.remarkable_settings['zoom-level'] = self.live_preview.get_zoom_level()
         self.write_settings()
         self.scrollPreviewToFix(self)
+
+    def on_toolbutton_zoom_in_clicked(self, widget):
+        self.zoom_in()
+
+    def on_toolbutton_zoom_out_clicked(self, widget):
+        self.zoom_out()
 
     def redo(self, widget):
         if self.text_buffer.can_redo():
@@ -894,6 +898,12 @@ class RemarkableWindow(Window):
                 self.editor_position = 0
         else:
             pass # Do nothing as live preview is not visible
+
+    def on_menuitem_zoom_in_activate(self, widget):
+        self.zoom_in()
+
+    def on_menuitem_zoom_out_activate(self, widget):
+        self.zoom_out()
 
     def on_menuitem_editor_font_activate(self, widget):
         self.font_chooser = Gtk.FontSelectionDialog()
@@ -1306,7 +1316,7 @@ class RemarkableWindow(Window):
 
     # Styles
     def update_style(self, widget):
-        self.default_html_start = '<!doctype HTML><html><head><meta charset="utf-8"><title>Made with Remarkable!</title><link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.1/styles/github.min.css">'
+        self.default_html_start = '<!doctype HTML><html><head><meta charset="utf-8"><title>Made with Remarkable!</title><link rel="stylesheet" href="' + self.media_path + 'highlightjs.default.min.css">'
         self.default_html_start += "<style type='text/css'>" + styles.get() + "</style>"
         self.default_html_start += "</head><body>"
 
