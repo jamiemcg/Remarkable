@@ -86,8 +86,8 @@ class RemarkableWindow(Window):
         self.default_html_end = '<script src="' + self.media_path + 'highlight.min.js"></script><script>hljs.initHighlightingOnLoad();</script><script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script><script type="text/javascript">MathJax.Hub.Config({"showProcessingMessages" : false,"messageStyle" : "none","tex2jax": { inlineMath: [ [ "$", "$" ] ] }});</script></body></html>'
         self.remarkable_settings = {}
 
-        self.default_extensions = ['markdown.extensions.extra','markdown.extensions.toc', 'markdown.extensions.smarty', 'markdown.extensions.nl2br', 'markdown.extensions.urlize', 'markdown.extensions.Highlighting', 'markdown.extensions.Strikethrough', 'markdown.extensions.markdown_checklist', 'markdown.extensions.superscript', 'markdown.extensions.subscript', 'markdown.extensions.mathjax']
-        self.safe_extensions = ['markdown.extensions.extra', 'markdown.extensions.nl2br']
+        self.default_extensions = ['markdown.extensions.extra','markdown.extensions.toc', 'markdown.extensions.smarty', 'markdown.extensions.urlize', 'markdown.extensions.Highlighting', 'markdown.extensions.Strikethrough', 'markdown.extensions.markdown_checklist', 'markdown.extensions.superscript', 'markdown.extensions.subscript', 'markdown.extensions.mathjax']
+        self.safe_extensions = ['markdown.extensions.extra']
         self.pdf_error_warning = False
 
         self.window = self.builder.get_object("remarkable_window")
@@ -805,7 +805,7 @@ class RemarkableWindow(Window):
             text = markdown.markdown(text, self.default_extensions)
         except:
             try:
-                html_middle = markdown.markdown(text, extensions =self.safe_extensions)
+                html_middle = markdown.markdown(text, extensions = self.safe_extensions)
             except:
                 html_middle = markdown.markdown(text)
         self.clipboard.set_text(text, -1)
