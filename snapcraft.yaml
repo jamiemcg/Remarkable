@@ -2,7 +2,7 @@ name: remarkable
 version: git
 summary: Remarkable editor
 description: |
-   Markdown parser, done right. Commonmark support, extensions, syntax plugins, high speed - all in one. Gulp and metalsmith plugins available. Used by Facebook, Docusaurus and many others!
+   A free fully featured markdown editor for Linux.
 confinement: strict
 base: core18
 grade: stable
