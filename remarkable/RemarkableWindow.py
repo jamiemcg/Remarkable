@@ -40,6 +40,7 @@ import styles
 import unicodedata
 import warnings
 from findBar import FindBar
+from RecentFilesMenu import RecentFilesMenu
 
 #Check if gtkspellcheck is installed
 try:
@@ -151,6 +152,12 @@ class RemarkableWindow(Window):
                                match_case, whole_word, regex)
         self.findbar.set_text_view(self.text_view)
 
+        #Recent files
+        recent_menu = self.builder.get_object("menuitem_recent_files")
+        recent_path = os.path.join(self.path, "recent_files.list")
+        self.recent_files_menu = RecentFilesMenu(recent_menu, recent_path, 10, self.open_document)
+        self.recent_files_menu.refresh()
+
         #Check if filename has been specified in terminal command
         if len(sys.argv) > 1:
             self.name = sys.argv[1]
@@ -163,6 +170,7 @@ class RemarkableWindow(Window):
                     self.text_buffer.set_modified(False)
             except:
                 print(self.name + " does not exist, creating it")
+            self.recent_files_menu.append_file(self.name)
 
         self.update_status_bar(self)
         self.update_live_preview(self)
@@ -395,9 +403,6 @@ class RemarkableWindow(Window):
         Opens a file for editing / viewing
     """
     def open(self, widget):
-        start, end = self.text_buffer.get_bounds()
-        text = self.text_buffer.get_text(start, end, False)
-        
         self.window.set_sensitive(False)
         chooser = Gtk.FileChooserDialog(title="Open File", action=Gtk.FileChooserAction.OPEN, buttons=(
             Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OPEN, Gtk.ResponseType.OK))
@@ -405,32 +410,36 @@ class RemarkableWindow(Window):
         response = chooser.run()
 
         if response == Gtk.ResponseType.OK:
-            # The user has selected a file
-            selected_file = chooser.get_filename()
-            
-            if len(text) == 0 and not self.text_buffer.get_modified():
-                # Current file is empty. Load contents of selected file into this view
-                
-                self.text_buffer.begin_not_undoable_action()
-                file = open(selected_file, 'r')
-                text = file.read()
-                file.close()
-                self.name = chooser.get_filename()
-                self.text_buffer.set_text(text)
-                title = chooser.get_filename().split("/")[-1]
-                self.window.set_title("Remarkable: " + title)
-                self.text_buffer.set_modified(False)
-                self.text_buffer.end_not_undoable_action()
-            else:
-                # A file is already open. Load the selected file in a new Remarkable process
-                subprocess.Popen([sys.argv[0], selected_file])
-        
+            self.open_document(chooser.get_filename())
+
         elif response == Gtk.ResponseType.CANCEL:
             # The user has clicked cancel
             pass
 
         chooser.destroy()
         self.window.set_sensitive(True)
+
+    def open_document(self, file_path):
+        start, end = self.text_buffer.get_bounds()
+        text = self.text_buffer.get_text(start, end, False)
+
+        if len(text) == 0 and not self.text_buffer.get_modified():
+            # Current file is empty. Load contents of selected file into this view
+
+            self.text_buffer.begin_not_undoable_action()
+            file = open(file_path, 'r')
+            text = file.read()
+            file.close()
+            self.name = file_path
+            self.text_buffer.set_text(text)
+            title = file_path.split("/")[-1]
+            self.window.set_title("Remarkable: " + title)
+            self.text_buffer.set_modified(False)
+            self.text_buffer.end_not_undoable_action()
+            self.recent_files_menu.append_file(file_path)
+        else:
+            # A file is already open. Load the selected file in a new Remarkable process
+            subprocess.Popen([sys.argv[0], file_path])
 
     def check_for_save(self, widget):
         reply = False
@@ -489,6 +498,7 @@ class RemarkableWindow(Window):
             self.text_buffer.set_modified(False)
             title = self.name.split("/")[-1]
             self.window.set_title("Remarkable: " + title)
+            self.recent_files_menu.append_file(self.name)
         elif response == Gtk.ResponseType.CANCEL:
             pass
         chooser.destroy()
