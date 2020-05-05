@@ -27,18 +27,4 @@ Check out the [homepage](https://remarkableapp.github.io/linux.html) for more de
 
 Feel free to report any bugs or make suggestions [here](https://github.com/jamiemcg/Remarkable/issues)
 
-### Donations/Tips :coffee: :beer: :smile:
-If you like Remarkable and wish to support further development you can make a donation using the links below or [else from here](https://remarkableapp.github.io/linux/donate.html)
-
-#### [Paypal](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=B5PJTSJNFYGT2)
-[![PayPay Remarkable](http://i.imgur.com/nobGgBf.png)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=B5PJTSJNFYGT2)
-#### Bitcoin
-![Bitcoin Remarkable](http://remarkableapp.github.io/images/QR%20wallet.png)
-
-
-Address: 17BTowSjuartEEgeta3RuHYxeJW1aeXxCv
-
-
-
-
-Jamie McGowan, 2019
+Jamie McGowan, 2020
