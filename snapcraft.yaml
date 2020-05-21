@@ -17,6 +17,7 @@ parts:
       sed -i -e 's/Popen(\[sys.argv\[0\]/Popen(\[sys.executable, sys.argv\[0\]/' /root/stage/remarkable/RemarkableWindow.py
       snapcraftctl prime
   remarkable:
+    after: [desktop-qt5]
     plugin: python
     python-version: python3
     source: .
@@ -34,9 +35,35 @@ parts:
       - gir1.2-webkit2-4.0
       - gir1.2-gtksource-3.0
       - python3-gtkspellcheck
+
+  desktop-qt5:
+    source: https://github.com/ubuntu/snapcraft-desktop-helpers.git
+    source-subdir: qt
+    plugin: make
+    make-parameters: ["FLAVOR=qt5"]
+    build-packages:
+      - qtbase5-dev
+      - dpkg-dev
+    stage-packages:
+      - libxkbcommon0
+      - ttf-ubuntu-font-family
+      - dmz-cursor-theme
+      - light-themes
+      - adwaita-icon-theme
+      - gnome-themes-standard
+      - shared-mime-info
+      - libqt5gui5
+      - libgdk-pixbuf2.0-0
+      - libqt5svg5 # for loading icon themes which are svg
+      - try: [appmenu-qt5] # not available on core18
+      - locales-all
+      - libgtk2.0-0
 apps:
   remarkable:
+    adapter: full
     command: usr/bin/python3 $SNAP/bin/remarkable
+    command-chain:
+      - bin/desktop-launch
     environment:
       PYTHONPATH: $SNAP/remarkable:$SNAP/remarkable_lib
       PATH: $SNAP/usr/sbin:$SNAP/usr/bin:$SNAP/sbin:$SNAP/bin:$SNAP/usr/lib:$PATH
