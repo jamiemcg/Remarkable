@@ -23,6 +23,12 @@ Remarkable has many features including:
 
 Check out the [homepage](https://remarkableapp.github.io/linux.html) for more details and [screenshots](https://remarkableapp.github.io/linux/screenshots.html).
 
+### Building for development
+
+* Install [snapcraft](https://snapcraft.io/)
+* run `snapcraft --debug` from this directory
+* install in devmode with `sudo snap install --devmode remarkable_xxx`
+
 ### Issues/Bugs/Suggestions
 
 Feel free to report any bugs or make suggestions [here](https://github.com/jamiemcg/Remarkable/issues)
