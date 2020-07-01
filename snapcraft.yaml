@@ -2,7 +2,7 @@ name: remarkable
 version: git
 summary: Remarkable editor
 description: |
-   A free fully featured markdown editor for Linux.
+  A Fully Featured Markdown Editor for Linux
 confinement: strict
 base: core18
 grade: stable
@@ -20,6 +20,8 @@ parts:
     plugin: python
     python-version: python3
     source: .
+    build-packages:
+      - build-essential
     stage-packages:
       - wkhtmltopdf
       - python3-gi

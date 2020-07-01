@@ -1,7 +1,7 @@
 #!usr/bin/python3
 # -*- Mode: Python; coding: utf-8; indent-tabs-mode: nil; tab-width: 4 -*-
 ### BEGIN LICENSE
-# Copyright (C) 2019 <Jamie McGowan> <jamiemcgowan.dev@gmail.com>
+# Copyright (C) 2020 <Jamie McGowan> <jamiemcgowan.dev@gmail.com>
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
 # in the Software without restriction, including without limitation the rights
@@ -41,7 +41,7 @@ import unicodedata
 import warnings
 from findBar import FindBar
 
-#Check if gtkspellcheck is installed
+# Check if gtkspellcheck is installed
 try:
     from gtkspellcheck import SpellChecker
     spellcheck_enabled = True
@@ -52,13 +52,13 @@ except:
 import logging
 logger = logging.getLogger('remarkable')
 
-#Ignore warnings re. scroll handler (temp. fix) && starting GTK warning
+# Ignore warnings re. scroll handler (temp. fix) && starting GTK warning
 warnings.filterwarnings("ignore", ".*has no handler with id.*")
 
 from remarkable_lib import Window, remarkableconfig
 from remarkable.AboutRemarkableDialog import AboutRemarkableDialog
 
-app_version = 1.87 #Remarkable app version
+app_version = 1.9 # Remarkable app version
 
 class RemarkableWindow(Window):
     __gtype_name__ = "RemarkableWindow"
@@ -78,7 +78,7 @@ class RemarkableWindow(Window):
         self.path = os.path.join(self.homeDir, ".remarkable/")
         self.settings_path = os.path.join(self.path, "remarkable.settings")
         self.media_path = remarkableconfig.get_data_path() + os.path.sep + "media" + os.path.sep
-        self.name = "Untitled" #Title of the current file, set to 'Untitled' as default
+        self.name = "Untitled" # Title of the current file, set to 'Untitled' as default
 
         self.default_html_start = '<!doctype HTML><html><head><meta charset="utf-8"><title>Made with Remarkable!</title><link rel="stylesheet" href="' + self.media_path + 'highlightjs.default.min.css">'
         self.default_html_start += "<style type='text/css'>" + styles.get() + "</style>"
@@ -151,7 +151,7 @@ class RemarkableWindow(Window):
                                match_case, whole_word, regex)
         self.findbar.set_text_view(self.text_view)
 
-        #Check if filename has been specified in terminal command
+        # Check if filename has been specified in terminal command
         if len(sys.argv) > 1:
             self.name = sys.argv[1]
             title = self.name.split("/")[-1]
@@ -167,16 +167,16 @@ class RemarkableWindow(Window):
         self.update_status_bar(self)
         self.update_live_preview(self)
 
-        #Check if an updated version of application exists
-        _thread.start_new_thread(self.check_for_updates, ())
+        # Check if an updated version of application exists [removed this functionality]
+        # _thread.start_new_thread(self.check_for_updates, ())
 
         self.text_view.grab_focus()
         
         if spellcheck_enabled:
             try:
-                self.spellchecker = SpellChecker(self.text_view, locale.getdefaultlocale()[0]) #Enabling spell checking
+                self.spellchecker = SpellChecker(self.text_view, locale.getdefaultlocale()[0]) # Enabling spell checking
             except:
-                pass #Spell checking not enabled
+                pass # Spell checking not enabled
 
         self.tv_scrolled = self.scrolledwindow_text_view.get_vadjustment().connect("value-changed", self.scrollPreviewTo)
         self.lp_scrolled_fix = self.scrolledwindow_live_preview.get_vadjustment().connect("value-changed", self.scrollPreviewToFix)
@@ -250,7 +250,7 @@ class RemarkableWindow(Window):
         settings_file.close()
 
     def load_settings(self):
-        self.custom_css = self.remarkable_settings['css'] #Load the custom css (don't auto enable)
+        self.custom_css = self.remarkable_settings['css'] # Load the custom css (don't auto enable)
 
         if self.remarkable_settings['nightmode']:
             # Enable night/dark mode on startup
@@ -340,10 +340,10 @@ class RemarkableWindow(Window):
     def scrollPreviewToFix(self, widget):
         self.scrolledwindow_live_preview.get_vadjustment().disconnect(self.lp_scrolled_fix)
         value = self.scrolledwindow_live_preview.get_vadjustment().get_value()
-        if value == 0: #Fix
+        if value == 0: # Fix
             self.scrollPreviewTo(self)
         else:
-            pass #Something better?
+            pass # Something better?
 
     def scrollPreviewTo(self, widget):
         self.scrolledwindow_live_preview.get_vadjustment().disconnect(self.lp_scrolled_fix)
@@ -465,8 +465,9 @@ class RemarkableWindow(Window):
             title = self.name.split("/")[-1]
             self.text_buffer.set_modified(False)
             self.window.set_title("Remarkable: " + title)
+            return True
         else:
-            self.save_as(self)
+            return self.save_as(self)
 
     def on_menuitem_save_as_activate(self, widget, crap = ""):
         self.save_as(self)
@@ -480,6 +481,9 @@ class RemarkableWindow(Window):
         title = self.name.split("/")[-1]
         chooser.set_title("Save As: " + title)
         response = chooser.run()
+        
+        saved = True
+
         if response == Gtk.ResponseType.OK:
             file = open(chooser.get_filename(), 'w')
             self.name = chooser.get_filename()
@@ -489,10 +493,11 @@ class RemarkableWindow(Window):
             self.text_buffer.set_modified(False)
             title = self.name.split("/")[-1]
             self.window.set_title("Remarkable: " + title)
-        elif response == Gtk.ResponseType.CANCEL:
-            pass
+        else:
+            saved = False # User cancelled saving after choosing to save. Need to cancel quit operation now
         chooser.destroy()
         self.window.set_sensitive(True)
+        return saved
 
     def on_menuitem_rtl_toggled(self, widget):
         self.rtl(widget.get_active())
@@ -623,10 +628,10 @@ class RemarkableWindow(Window):
                     'no-outline': None})
             except:
                 try:
-                    #Failed so try with no options
+                    # Failed so try with no options
                     pdfkit.from_string(html, file_name)
                 except:
-                    #Pdf Export failed, show warning message
+                    # Pdf Export failed, show warning message
                     if not self.pdf_error_warning:
                         self.pdf_error_warning = True
                         print("\nRemarkable Error:\tPDF Export Failed!!")
@@ -651,10 +656,17 @@ class RemarkableWindow(Window):
     def window_delete_event(self, widget, callback=None):
         start, end = self.text_buffer.get_bounds()
         text = self.text_buffer.get_text(start, end, False)
+
+        safe_to_quit = True # Keep track if user cancelled save operation
+
         if len(text) > 0:
             if self.check_for_save(None):
-                self.save(self)
-        self.quit_requested(None)
+                safe_to_quit = self.save(self)
+        
+        if safe_to_quit:
+            self.quit_requested(None)
+        else:
+            pass
 
     def quit_requested(self, widget, callback_data=None):
         self.clean_up() # Second time, just to be safe
@@ -799,6 +811,7 @@ class RemarkableWindow(Window):
             start, end = self.text_buffer.get_bounds()
             self.text_buffer.sort_lines(start, end, GtkSource.SortFlags.REVERSE_ORDER, 0)
     
+    # Copy all text from the editor pane and format it as HTML in the clipboard
     def on_menuitem_copy_all_activate(self, widget):
         text = self.text_buffer.get_text(self.text_buffer.get_start_iter(), self.text_buffer.get_end_iter(), False)
         try:
@@ -810,6 +823,7 @@ class RemarkableWindow(Window):
                 html_middle = markdown.markdown(text)
         self.clipboard.set_text(text, -1)
 
+    # Copy selected text from the editor pane and format as HTML in the clipboard
     def on_menuitem_copy_selection_activate(self, widget):
         if self.text_buffer.get_has_selection():
             start, end = self.text_buffer.get_selection_bounds()
@@ -1213,6 +1227,61 @@ class RemarkableWindow(Window):
     def on_toolbutton_image_clicked(self, widget):
         self.insert_image(self)
 
+    def on_menuitem_table_activate(self, widget):
+        self.insert_table(self)
+
+    def insert_table(self, widget):
+        self.insert_window_table = Gtk.Window()
+        self.insert_window_table.set_title("Insert Table")
+        self.insert_window_table.set_resizable(True)
+        self.insert_window_table.set_border_width(6)
+        self.insert_window_table.set_default_size(300, 250)
+        self.insert_window_table.set_position(Gtk.WindowPosition.CENTER)
+        vbox = Gtk.VBox()
+        label_n_rows = Gtk.Label("Number of Rows:")
+        self.entry_n_rows = Gtk.Entry()
+        label_n_columns = Gtk.Label("Number of Columns")
+        self.entry_n_columns = Gtk.Entry()
+        vbox.pack_start(label_n_rows, self, False, False)
+        vbox.pack_start(self.entry_n_rows, self, False, False)
+        vbox.pack_start(label_n_columns, self, False, False)
+        vbox.pack_start(self.entry_n_columns, self, False, False)
+        button = Gtk.Button("Insert Table")
+        vbox.pack_end(button, self, False, False)
+        self.insert_window_table.add(vbox)
+        self.insert_window_table.show_all()
+        button.connect("clicked", self.insert_table_cmd, self.insert_window_table)
+    
+    def insert_table_cmd(self, widget, window):
+        # if self.entry_url_i.get_text():
+        n_rows = self.entry_n_rows.get_text()
+        n_columns = self.entry_n_columns.get_text()
+
+        if n_rows and n_columns:
+            try:
+                n_rows = int(n_rows)
+            except:
+                return
+            try:
+                n_columns = int(n_columns)
+            except:
+                return
+                
+            if n_rows > 0 and n_columns > 0:
+                table_str = ""
+                line = ("|  "  * n_columns) + "|"
+                header_line = ("|--" * n_columns) + "|"
+
+                table_str = line + "\n" + header_line + "\n"
+                if n_rows > 1:
+                    n_rows -= 1
+                    while n_rows > 0:                     
+                        table_str += line + "\n"
+                        n_rows -= 1
+
+                self.text_buffer.insert_at_cursor(table_str)
+        self.insert_window_table.hide()
+
     def insert_image(self, widget):
         self.insert_window_image = Gtk.Window()
         self.insert_window_image.set_title("Insert Image")
@@ -1398,7 +1467,7 @@ class RemarkableWindow(Window):
         self.remarkable_settings['style'] = "solarized_light"
         self.write_settings()
 
-    ##Custom CSS
+    # Custom CSS
     def on_menuitem_custom_activate(self, widget):
         self.custom_window = Gtk.Window()
         self.custom_window.set_default_size(640, 480)
@@ -1449,28 +1518,30 @@ class RemarkableWindow(Window):
 
     def on_menuitem_donate_activate(self, widget):
         webbrowser.open_new_tab("http://remarkableapp.github.io/linux/donate")
+ 
+    # Have disabled the check for updates function and also removed this choice from the About menu
 
-    def on_menuitem_check_for_updates_activate(self, widget):
-        _thread.start_new_thread(self.check_for_updates, (True,))
+    # def on_menuitem_check_for_updates_activate(self, widget):
+    #     _thread.start_new_thread(self.check_for_updates, (True,))
 
-    def check_for_updates(self, show = False):
-        try:
-            update_check = urlopen("http://remarkableapp.github.io/latest")
-            latest_version = float(update_check.readline())
-            if app_version < latest_version:
-                print("There is a new version avaiable")
-                subprocess.Popen(['notify-send', "Remarkable: A new version of this app is avaiable"])
-                update_check = urlopen("http://remarkableapp.github.io/change_log")
-                md = update_check.read()
-                html = markdown.markdown(md)
-                if show:
-                    webbrowser.open_new_tab("http://remarkableapp.github.io")
-            else:
-                if show:
-                    subprocess.Popen(['notify-send', "Remarkable: You already have the latest version of this app available"])
-                    print("You have the latest version of this app available")
-        except:
-            print("Warning: Remarkable could not connect to the internet to check for updates")
+    # def check_for_updates(self, show = False):
+    #     try:
+    #         update_check = urlopen("http://remarkableapp.github.io/latest")
+    #         latest_version = float(update_check.readline())
+    #         if app_version < latest_version:
+    #             print("There is a new version avaiable")
+    #             subprocess.Popen(['notify-send', "Remarkable: A new version of this app is avaiable"])
+    #             update_check = urlopen("http://remarkableapp.github.io/change_log")
+    #             md = update_check.read()
+    #             html = markdown.markdown(md)
+    #             if show:
+    #                 webbrowser.open_new_tab("http://remarkableapp.github.io")
+    #         else:
+    #             if show:
+    #                 subprocess.Popen(['notify-send', "Remarkable: You already have the latest version of this app available"])
+    #                 print("You have the latest version of this app available")
+    #     except:
+    #         print("Warning: Remarkable could not connect to the internet to check for updates")
 
     def on_text_view_changed(self, widget):
         start, end = self.text_buffer.get_bounds()

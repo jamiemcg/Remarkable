@@ -1,6 +1,6 @@
 # -*- Mode: Python; coding: utf-8; indent-tabs-mode: nil; tab-width: 4 -*-
 ### BEGIN LICENSE
-# Copyright (C) 2019 <Jamie McGowan> <jamiemcgowan.dev@gmail.com>
+# Copyright (C) 2020 <Jamie McGowan> <jamiemcgowan.dev@gmail.com>
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
 # in the Software without restriction, including without limitation the rights
@@ -32,7 +32,7 @@ __all__ = [
 #(for instance, images and ui files).
 __remarkable_data_directories__ = ['../data', '/usr/share/remarkable']
 __license__ = 'MIT'
-__version__ = '1.87'
+__version__ = '1.9'
 
 import os
 
