@@ -666,7 +666,7 @@ class RemarkableWindow(Window):
         if safe_to_quit:
             self.quit_requested(None)
         else:
-            pass
+            return True # Cancel the quit operation as user didn't saving the changes
 
     def quit_requested(self, widget, callback_data=None):
         self.clean_up() # Second time, just to be safe
