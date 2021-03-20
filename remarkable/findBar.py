@@ -148,6 +148,9 @@ class FindBar(object):
             self.textview.scroll_to_mark(
                 buf.get_insert(), 0.25, True, 0.5, 0.5)
 
+    def on_hide_panel_button_clicked(self, entry):
+            self.hide()
+
     def on_find_entry_changed(self, entry):
         self.find_entry.get_style_context().remove_class("not-found")
         self._find_text(0)

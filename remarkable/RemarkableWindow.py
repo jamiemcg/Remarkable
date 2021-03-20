@@ -199,6 +199,9 @@ class RemarkableWindow(Window):
     def on_replace_all_button_clicked(self, widget):
         self.findbar.on_replace_all_button_clicked(widget)
 
+    def on_hide_panel_button_clicked(self, widget):
+        self.findbar.on_hide_panel_button_clicked(widget)
+
     def can_redo_changed(self, widget):
         if self.text_buffer.can_redo():
             self.builder.get_object("menuitem_redo").set_sensitive(True)
