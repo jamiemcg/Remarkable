@@ -8,10 +8,10 @@
 # to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 # copies of the Software, and to permit persons to whom the Software is
 # furnished to do so, subject to the following conditions:
-# 
+#
 # The above copyright notice and this permission notice shall be included in
 # all copies or substantial portions of the Software.
-# 
+#
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 # IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 # FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -62,7 +62,7 @@ app_version = 1.9 # Remarkable app version
 
 class RemarkableWindow(Window):
     __gtype_name__ = "RemarkableWindow"
-    
+
     def finish_initializing(self, builder): # pylint: disable=E1002
         """Set up the main window"""
         super(RemarkableWindow, self).finish_initializing(builder)
@@ -84,6 +84,7 @@ class RemarkableWindow(Window):
         self.default_html_start += "<style type='text/css'>" + styles.get() + "</style>"
         self.default_html_start += "</head><body id='MathPreviewF'>"
         self.default_html_end = '<script src="' + self.media_path + 'highlight.min.js"></script><script>hljs.initHighlightingOnLoad();</script><script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script><script type="text/javascript">MathJax.Hub.Config({"showProcessingMessages" : false,"messageStyle" : "none","tex2jax": { inlineMath: [ [ "$", "$" ] ] }});</script></body></html>'
+
         self.remarkable_settings = {}
 
         self.default_extensions = ['markdown.extensions.extra','markdown.extensions.toc', 'markdown.extensions.smarty', 'markdown.extensions.urlize', 'markdown.extensions.Highlighting', 'markdown.extensions.Strikethrough', 'markdown.extensions.markdown_checklist', 'markdown.extensions.superscript', 'markdown.extensions.subscript', 'markdown.extensions.mathjax']
@@ -94,16 +95,18 @@ class RemarkableWindow(Window):
         self.window.connect("delete-event", self.window_delete_event)
         self.window.connect("destroy", self.quit_requested)
 
+        self.window.connect("scroll-event", self.jsScrollPreviewTo)
+
         self.text_buffer = GtkSource.Buffer()
         self.text_view = GtkSource.View.new_with_buffer(self.text_buffer)
         self.text_view.set_show_line_numbers(True)
         self.text_view.set_auto_indent(True)
-        
+
         # Force the SourceView to use a SourceBuffer and not a TextBuffer
         self.lang_manager = GtkSource.LanguageManager()
         self.text_buffer.set_language(self.lang_manager.get_language('markdown'))
         self.text_buffer.set_highlight_matching_brackets(True)
-        
+
         self.undo_manager = self.text_buffer.get_undo_manager()
         self.undo_manager.connect("can-undo-changed", self.can_undo_changed)
         self.undo_manager.connect("can-redo-changed", self.can_redo_changed)
@@ -114,6 +117,11 @@ class RemarkableWindow(Window):
         self.text_view.connect('key-press-event', self.cursor_ctrl_arrow_rtl_fix)
 
         self.live_preview = WebKit2.WebView()
+
+        # self.live_preview.connect('load-changed', self.jsScrollPreviewRestore)
+
+        # control webview scroll
+        self.js_scrolledwindow_live_preview_value = 0
 
         self.scrolledwindow_text_view = Gtk.ScrolledWindow()
         self.scrolledwindow_text_view.add(self.text_view)
@@ -164,6 +172,7 @@ class RemarkableWindow(Window):
             except:
                 print(self.name + " does not exist, creating it")
 
+
         self.update_status_bar(self)
         self.update_live_preview(self)
 
@@ -171,7 +180,7 @@ class RemarkableWindow(Window):
         # _thread.start_new_thread(self.check_for_updates, ())
 
         self.text_view.grab_focus()
-        
+
         if spellcheck_enabled:
             try:
                 self.spellchecker = SpellChecker(self.text_view, locale.getdefaultlocale()[0]) # Enabling spell checking
@@ -181,8 +190,8 @@ class RemarkableWindow(Window):
         self.tv_scrolled = self.scrolledwindow_text_view.get_vadjustment().connect("value-changed", self.scrollPreviewTo)
         self.lp_scrolled_fix = self.scrolledwindow_live_preview.get_vadjustment().connect("value-changed", self.scrollPreviewToFix)
         self.scrolledwindow_live_preview.get_vadjustment().set_lower(1)
-
         self.temp_file_list = []
+
 
     def on_find_next_button_clicked(self, widget):
         self.findbar.on_find_next_button_clicked(widget)
@@ -224,11 +233,11 @@ class RemarkableWindow(Window):
             os.makedirs(self.path)
         if not os.path.isfile(self.settings_path):
             self.remarkable_settings = {}
-            self.remarkable_settings['css'] = '' 
-            self.remarkable_settings['font'] = "Sans 10"  
+            self.remarkable_settings['css'] = ''
+            self.remarkable_settings['font'] = "Sans 10"
             self.remarkable_settings['line-numbers'] = True
             self.remarkable_settings['live-preview'] = True
-            self.remarkable_settings['nightmode'] = False       
+            self.remarkable_settings['nightmode'] = False
             self.remarkable_settings['statusbar'] = True
             self.remarkable_settings['style'] = "github"
             self.remarkable_settings['toolbar'] = True
@@ -276,18 +285,18 @@ class RemarkableWindow(Window):
         if self.remarkable_settings['statusbar'] == False:
             # Hide the statusbar on startup
             self.on_menuitem_statusbar_activate(self)
-        
+
         # New settings, create them with default if they don't exist
         if "line-numbers" not in self.remarkable_settings:
             self.remarkable_settings['line-numbers'] = True
-                
+
         if self.remarkable_settings['line-numbers'] == False:
             # Hide line numbers on startup
             self.builder.get_object("menuitem_line_numbers").set_active(False)
 
         if "vertical" not in self.remarkable_settings:
             self.remarkable_settings['vertical'] = False
-            
+
         if self.remarkable_settings['vertical'] == True:
             # Switch to vertical layout
             self.builder.get_object("menuitem_vertical_layout").set_active(True)
@@ -304,7 +313,7 @@ class RemarkableWindow(Window):
             self.text_view.override_font(Pango.FontDescription(self.font))
         except:
             pass # Loading font failed --> leave at default font
-            
+
         # Try to load the previously chosen style. May fail if so, ignore
         try:
             self.style = self.remarkable_settings['style']
@@ -340,7 +349,34 @@ class RemarkableWindow(Window):
         except:
             print("Couldn't choose previously selected style")
 
+    def jsScrollPreviewTo(self, widget, event):
+        self.live_preview.run_javascript('window.scrollY',
+                                callback=self.jsScrollPreviewToCallback)
+
+    def jsScrollPreviewToCallback(self, webview, result):
+        value = 0
+        try:
+            value = int(self.live_preview.run_javascript_finish(result).\
+                                        get_js_value().to_string())
+        except:
+            pass
+
+        self.js_scrolledwindow_live_preview_value = value
+
+    def jsInjectScrollPreview(self, html):
+        html += '<script>window.scroll(0, {})</script>'.format(self.js_scrolledwindow_live_preview_value)
+        return html
+
+    # with blink
+    def jsScrollPreviewRestore(self, widget, event):
+        if event is WebKit2.LoadEvent.FINISHED:
+
+            # restore webview scroll
+            self.live_preview.run_javascript('window.scroll(0, {})'.format(
+                                        self.js_scrolledwindow_live_preview_value))
+
     def scrollPreviewToFix(self, widget):
+
         self.scrolledwindow_live_preview.get_vadjustment().disconnect(self.lp_scrolled_fix)
         value = self.scrolledwindow_live_preview.get_vadjustment().get_value()
         if value == 0: # Fix
@@ -349,6 +385,7 @@ class RemarkableWindow(Window):
             pass # Something better?
 
     def scrollPreviewTo(self, widget):
+
         self.scrolledwindow_live_preview.get_vadjustment().disconnect(self.lp_scrolled_fix)
         value = self.scrolledwindow_text_view.get_vadjustment().get_value()
         upper_edit = self.scrolledwindow_text_view.get_vadjustment().get_upper()
@@ -358,6 +395,7 @@ class RemarkableWindow(Window):
         else:
             self.scrolledwindow_live_preview.get_vadjustment().set_value(value / upper_edit * preview_upper)
         self.lp_scrolled_fix = self.scrolledwindow_live_preview.get_vadjustment().connect("value-changed", self.scrollPreviewToFix)
+
 
     def on_menuitem_numbered_list_activate(self, widget):
         if self.text_buffer.get_has_selection():
@@ -400,7 +438,7 @@ class RemarkableWindow(Window):
     def open(self, widget):
         start, end = self.text_buffer.get_bounds()
         text = self.text_buffer.get_text(start, end, False)
-        
+
         self.window.set_sensitive(False)
         chooser = Gtk.FileChooserDialog(title="Open File", action=Gtk.FileChooserAction.OPEN, buttons=(
             Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OPEN, Gtk.ResponseType.OK))
@@ -410,10 +448,10 @@ class RemarkableWindow(Window):
         if response == Gtk.ResponseType.OK:
             # The user has selected a file
             selected_file = chooser.get_filename()
-            
+
             if len(text) == 0 and not self.text_buffer.get_modified():
                 # Current file is empty. Load contents of selected file into this view
-                
+
                 self.text_buffer.begin_not_undoable_action()
                 file = open(selected_file, 'r')
                 text = file.read()
@@ -427,7 +465,7 @@ class RemarkableWindow(Window):
             else:
                 # A file is already open. Load the selected file in a new Remarkable process
                 subprocess.Popen([sys.argv[0], selected_file])
-        
+
         elif response == Gtk.ResponseType.CANCEL:
             # The user has clicked cancel
             pass
@@ -565,7 +603,7 @@ class RemarkableWindow(Window):
                 file_name += ".html"
             file = open(file_name, 'w')
             soup = BeautifulSoup(html, "lxml")
-            
+
             file.write(soup.prettify())
             file.close()
         elif response == Gtk.ResponseType.CANCEL:
@@ -604,7 +642,7 @@ class RemarkableWindow(Window):
                 html_middle = markdown.markdown(text)
         html = html_middle
         self.save_pdf(html)
-        
+
     def save_pdf(self, html):
         chooser = Gtk.FileChooserDialog("Export PDF", None, Gtk.FileChooserAction.SAVE,
                                         (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
@@ -813,7 +851,7 @@ class RemarkableWindow(Window):
             # No selection active, sort all lines in reverse
             start, end = self.text_buffer.get_bounds()
             self.text_buffer.sort_lines(start, end, GtkSource.SortFlags.REVERSE_ORDER, 0)
-    
+
     # Copy all text from the editor pane and format it as HTML in the clipboard
     def on_menuitem_copy_all_activate(self, widget):
         text = self.text_buffer.get_text(self.text_buffer.get_start_iter(), self.text_buffer.get_end_iter(), False)
@@ -995,7 +1033,7 @@ class RemarkableWindow(Window):
         html = self.default_html_start + html_middle + self.default_html_end
         tf.write(html.encode())
         tf.flush()
-        
+
         # Load the temporary HTML file in the user's default browser
         webbrowser.open_new_tab(tf_name)
 
@@ -1441,7 +1479,6 @@ class RemarkableWindow(Window):
         self.remarkable_settings['style'] = "metro_vibes_dark"
         self.write_settings()
 
-
     def on_menuitem_modern_activate(self, widget):
         styles.set(styles.modern_css)
         self.update_style(self)
@@ -1455,7 +1492,7 @@ class RemarkableWindow(Window):
         self.update_live_preview(self)
         self.remarkable_settings['style'] = "screen"
         self.write_settings()
-    
+
     def on_menuitem_solarized_dark_activate(self, widget):
         styles.set(styles.solarized_dark)
         self.update_style(self)
@@ -1505,7 +1542,7 @@ class RemarkableWindow(Window):
 
     def on_menuitem_github_page_activate(self, widget):
         webbrowser.open_new_tab("https://github.com/jamiemcg/remarkable")
-    
+
     def on_menuitem_reportbug_activate(self, widget):
         webbrowser.open_new_tab("https://github.com/jamiemcg/remarkable/issues")
 
@@ -1548,7 +1585,7 @@ class RemarkableWindow(Window):
 
     def on_text_view_changed(self, widget):
         start, end = self.text_buffer.get_bounds()
-        
+
         if self.statusbar.get_visible():
             self.update_status_bar(self)
         else:  # statusbar not present, don't need to update/count words, etc.
@@ -1636,7 +1673,7 @@ class RemarkableWindow(Window):
                 html_middle = markdown.markdown(text, extensions =self.safe_extensions)
             except:
                 html_middle = markdown.markdown(text)
-        html = self.default_html_start + html_middle + self.default_html_end
+        html = self.default_html_start + self.jsInjectScrollPreview(html_middle) + self.default_html_end
 
         # Update the display, supporting relative paths to local images
         self.live_preview.load_html(html, "file://{}".format(os.path.abspath(self.name)))
