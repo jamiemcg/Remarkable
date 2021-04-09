@@ -978,7 +978,7 @@ class RemarkableWindow(Window):
 
     def on_menuitem_preview_browser_activate(self, widget):
         # Create a temporary HTML file
-        tf = tempfile.NamedTemporaryFile(delete = False)
+        tf = tempfile.NamedTemporaryFile(delete = False, suffix='.html')
         self.temp_file_list.append(tf)
         tf_name = tf.name
 
