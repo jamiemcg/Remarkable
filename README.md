@@ -82,5 +82,6 @@ Copy the remarkable.desktop file
 ```
 cd <path to the repository>/Remarkable/
 cp remarkable.desktop /home/norbert/.local/share/applications/
+cp ./data/media/remarkable.png ~/.local/share/icons/
 ```
 Test it via startmenu
