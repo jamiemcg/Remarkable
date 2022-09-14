@@ -63,3 +63,24 @@ Check out the [homepage](https://remarkableapp.github.io/linux.html) for more de
 |Undo|Ctrl+Z|
 |Zoom In|Ctrl+Plus|
 |Zoom Out|Ctrl+Minus|
+
+### Install on Linux Mint 21 Vanessa
+1) Clone this repository
+```
+cd <path to the repository>
+git clone https://github.com/wilmsn/Remarkable.git
+```
+Install markdown support for python
+```
+sudo apt install python3-markdown
+```
+Link the starter
+```
+sudo ln -s <path to the repository>/Remarkable/run.sh /usr/bin/remarkable
+```
+Copy the remarkable.desktop file
+```
+cd <path to the repository>/Remarkable/
+cp remarkable.desktop /home/norbert/.local/share/applications/
+```
+Test it via startmenu
