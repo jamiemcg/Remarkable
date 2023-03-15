@@ -26,8 +26,10 @@ Remarkable has many features including:
 Check out the [homepage](https://remarkableapp.github.io/linux.html) for more details and [screenshots](https://remarkableapp.github.io/linux/screenshots.html).
 
 ### Dependencies
-
-**!!!TODO!!!**
+~~~
+- pip install bs4
+- pip install markdown
+~~~
 
 ### Keyboard Shortcuts
 
