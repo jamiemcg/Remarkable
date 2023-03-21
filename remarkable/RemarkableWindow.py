@@ -1,4 +1,4 @@
-#!usr/bin/python3
+#!/usr/bin/python3
 # -*- Mode: Python; coding: utf-8; indent-tabs-mode: nil; tab-width: 4 -*-
 ### BEGIN LICENSE
 # Copyright (C) 2020 <Jamie McGowan> <jamiemcgowan.dev@gmail.com>
@@ -36,10 +36,10 @@ import pdfkit
 import re, subprocess, datetime, os, webbrowser, _thread, sys, locale
 import tempfile
 import traceback
-import styles
+from remarkable import styles
 import unicodedata
 import warnings
-from findBar import FindBar
+from .findBar import FindBar
 
 # Check if gtkspellcheck is installed
 try:
