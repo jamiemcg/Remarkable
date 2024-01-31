@@ -331,7 +331,7 @@ class RemarkableWindow(Window):
             elif self.style == "solarized_light":
                 styles.set(styles.solarized_light)
             elif self.style == "custom":
-                styles.set(styles.custom_css)
+                styles.set(self.custom_css)
             else:
                 print("Style key error")
 
