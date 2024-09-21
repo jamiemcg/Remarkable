@@ -1,4 +1,3 @@
-# -*- Mode: Python; coding: utf-8; indent-tabs-mode: nil; tab-width: 4 -*-
 ### BEGIN LICENSE
 # Copyright (C) 2024 <Jamie McGowan> <jamiemcgowan.dev@gmail.com>
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -20,34 +19,20 @@
 # THE SOFTWARE.
 ### END LICENSE
 
-import optparse, sys
-from locale import gettext as _
+from markdown.inlinepatterns import SimpleTagPattern
+from markdown.extensions import Extension
 
-import gi
-gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk # pylint: disable=E0611
+reg_pattern = r'(~{1})([^\?]+?)(~{1})'
 
-from remarkable import RemarkableWindow
+class Subscript(Extension): 
+    def extendMarkdown(self, md):
+        """Modifies inline patterns."""
+        mark_tag = SimpleTagPattern(reg_pattern, 'sub')
+        md.inlinePatterns.register(mark_tag, 'subscript', 175)
+        
+def makeExtension(**kwargs):
+    return Subscript(**kwargs)
 
-from remarkable_lib import set_up_logging, get_version
-
-def parse_options():
-    """Support for command line options"""
-    parser = optparse.OptionParser(version="%%prog %s" % get_version())
-    parser.add_option(
-        "-v", "--verbose", action="count", dest="verbose",
-        help=_("Show debug messages (-vv debugs remarkable_lib also)"))
-    (options, args) = parser.parse_args()
-
-    set_up_logging(options)
-
-def main():
-    'constructor for your class instances'
-    parse_options()
-
-    # Run the application.    
-    window = RemarkableWindow.RemarkableWindow()
-
-    window.show_all()
-    window.check_settings() # Load settings after app displayed to fix bugs!
-    Gtk.main()
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()

@@ -1,5 +1,5 @@
 ### BEGIN LICENSE
-# Copyright (C) 2020 <Jamie McGowan> <jamiemcgowan.dev@gmail.com>
+# Copyright (C) 2024 <Jamie McGowan> <jamiemcgowan.dev@gmail.com>
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
 # in the Software without restriction, including without limitation the rights
@@ -22,16 +22,16 @@
 from markdown.inlinepatterns import SimpleTagPattern
 from markdown.extensions import Extension
 
-reg_pattern =r'(={2})([^\?]+?)(={2})'  
+reg_pattern = r'(~{2})([^\?]+?)(~{2})'  
 
-class Highlighting(Extension): 
-    def extendMarkdown(self, md, md_globals):
+class Strikethrough(Extension): 
+    def extendMarkdown(self, md):
         """Modifies inline patterns."""
-        mark_tag = SimpleTagPattern(reg_pattern, 'mark')
-        md.inlinePatterns.add('mark', mark_tag, '_begin')
+        mark_tag = SimpleTagPattern(reg_pattern, 'del')
+        md.inlinePatterns.register(mark_tag, 'strikethrough', 175)
         
-def makeExtension(configs=[]):
-    return Highlighting(configs)
+def makeExtension(**kwargs):
+    return Strikethrough(**kwargs)
 
 if __name__ == "__main__":
     import doctest

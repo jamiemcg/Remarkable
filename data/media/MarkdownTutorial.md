@@ -74,8 +74,11 @@ A horizontal rule is as follows:
 ---
 
 ~~Strikethrough text~~
+
 ==Highlight text==
+
 Some text ~Subscript~
+
 Some text ^Superscript^
 
 ---

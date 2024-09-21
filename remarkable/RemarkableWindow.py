@@ -1,17 +1,17 @@
 #!usr/bin/python3
-# -*- Mode: Python; coding: utf-8; indent-tabs-mode: nil; tab-width: 4 -*-
+
 ### BEGIN LICENSE
-# Copyright (C) 2020 <Jamie McGowan> <jamiemcgowan.dev@gmail.com>
+# Copyright (C) 2024 <Jamie McGowan> <jamiemcgowan.dev@gmail.com>
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
 # in the Software without restriction, including without limitation the rights
 # to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 # copies of the Software, and to permit persons to whom the Software is
 # furnished to do so, subject to the following conditions:
-# 
+#
 # The above copyright notice and this permission notice shall be included in
 # all copies or substantial portions of the Software.
-# 
+#
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 # IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 # FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -24,7 +24,7 @@
 import gi
 gi.require_version('Gtk', '3.0')
 gi.require_version('GtkSource', '3.0')
-gi.require_version('WebKit2', '4.0')
+gi.require_version('WebKit2', '4.1')
 
 from bs4 import BeautifulSoup
 from gi.repository import Gdk, Gtk, GtkSource, Pango, WebKit2
@@ -56,9 +56,18 @@ logger = logging.getLogger('remarkable')
 warnings.filterwarnings("ignore", ".*has no handler with id.*")
 
 from remarkable_lib import Window, remarkableconfig
+
+from remarkable.markdown.extensions.Highlighting import Highlighting
+from remarkable.markdown.extensions.Strikethrough import Strikethrough
+from remarkable.markdown.extensions.Checklist import Checklist
+from remarkable.markdown.extensions.Superscript import Superscript
+from remarkable.markdown.extensions.Subscript import Subscript
+from remarkable.markdown.extensions.AutoLink import AutoLink
+from remarkable.markdown.extensions.MathJax import MathJax
+
 from remarkable.AboutRemarkableDialog import AboutRemarkableDialog
 
-app_version = 1.9 # Remarkable app version
+app_version = 1.95 # Remarkable app version
 
 class RemarkableWindow(Window):
     __gtype_name__ = "RemarkableWindow"
@@ -86,7 +95,18 @@ class RemarkableWindow(Window):
         self.default_html_end = '<script src="' + self.media_path + 'highlight.min.js"></script><script>hljs.initHighlightingOnLoad();</script><script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script><script type="text/javascript">MathJax.Hub.Config({"showProcessingMessages" : false,"messageStyle" : "none","tex2jax": { inlineMath: [ [ "$", "$" ] ] }});</script></body></html>'
         self.remarkable_settings = {}
 
-        self.default_extensions = ['markdown.extensions.extra','markdown.extensions.toc', 'markdown.extensions.smarty', 'markdown.extensions.urlize', 'markdown.extensions.Highlighting', 'markdown.extensions.Strikethrough', 'markdown.extensions.markdown_checklist', 'markdown.extensions.superscript', 'markdown.extensions.subscript', 'markdown.extensions.mathjax']
+        self.default_extensions = ['markdown.extensions.extra']
+        self.default_extensions += ['remarkable.markdown.extensions.Highlighting:Highlighting']
+        self.default_extensions += ['remarkable.markdown.extensions.AutoLink:AutoLink']
+        self.default_extensions += ['markdown.extensions.toc']
+        self.default_extensions += ['markdown.extensions.smarty']
+        self.default_extensions += ['remarkable.markdown.extensions.Strikethrough:Strikethrough']
+        self.default_extensions += ['remarkable.markdown.extensions.Checklist:Checklist']
+        self.default_extensions += ['remarkable.markdown.extensions.Superscript:Superscript']
+        self.default_extensions += ['remarkable.markdown.extensions.Subscript:Subscript']
+        self.default_extensions += ['remarkable.markdown.extensions.MathJax:MathJax']
+
+
         self.safe_extensions = ['markdown.extensions.extra']
         self.pdf_error_warning = False
 
@@ -627,17 +647,20 @@ class RemarkableWindow(Window):
                     'margin-bottom': '0.75in',
                     'margin-left': '0.75in',
                     'encoding': "UTF-8",
-                    'javascript-delay' : '550',
+                    'javascript-delay' : '1000',
+                    'enable-local-file-access': None,
                     'no-outline': None})
             except:
                 try:
                     # Failed so try with no options
                     pdfkit.from_string(html, file_name)
-                except:
+                except Exception as e:
                     # Pdf Export failed, show warning message
                     if not self.pdf_error_warning:
                         self.pdf_error_warning = True
                         print("\nRemarkable Error:\tPDF Export Failed!!")
+
+                    print("Exception:", e)
 
                     pdf_fail_dialog = Gtk.MessageDialog(self, 0, Gtk.MessageType.ERROR,
                             Gtk.ButtonsType.CANCEL, "PDF EXPORT FAILED")
@@ -1630,10 +1653,11 @@ class RemarkableWindow(Window):
     def update_live_preview(self, widet):
         text = self.text_buffer.get_text(self.text_buffer.get_start_iter(), self.text_buffer.get_end_iter(), False)
         try:
-            html_middle = markdown.markdown(text, self.default_extensions)
-        except:
+            html_middle = markdown.markdown(text, extensions=self.default_extensions)
+        except Exception as e:
+            print(e)
             try:
-                html_middle = markdown.markdown(text, extensions =self.safe_extensions)
+                html_middle = markdown.markdown(text, extensions=self.safe_extensions)
             except:
                 html_middle = markdown.markdown(text)
         html = self.default_html_start + html_middle + self.default_html_end
