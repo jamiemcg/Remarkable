@@ -1536,8 +1536,12 @@ class RemarkableWindow(Window):
         self.AboutDialog.show(self)
 
     def on_menuitem_markdown_tutorial_activate(self, widget):
+        # tutorial_path = "/usr/share/remarkable/media/MarkdownTutorial.md"
         tutorial_path = self.media_path + "MarkdownTutorial.md"
-        subprocess.Popen([sys.argv[0], tutorial_path])
+        try:
+            subprocess.Popen([sys.argv[0], tutorial_path])
+        except Exception as e:
+            print("Exception:", e, "could not launch remarkable process - ", sys.argv[0], tutorial_path)
 
     def on_menuitem_homepage_activate(self, widget):
         webbrowser.open_new_tab("http://remarkableapp.github.io")

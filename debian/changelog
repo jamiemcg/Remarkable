@@ -1,4 +1,12 @@
-remarkable (1.87) xenial; urgency=medium
+remarkable (1.95) noble; urgency=medium
+
+  * Updated dependencies for 2024. Tested on Ubuntu 24.04 LTS. Rewrote/fixed
+  remarkable markdown extensions to work with updated python-markdown extension
+  API. Sycn. scrolling still broken.
+
+ -- Jamie McGowan <jamiemcgowan.dev@gmail.com>  Sat, 21 Sept 2024 22:57:40 +0100
+
+ remarkable (1.87) xenial; urgency=medium
 
   * Image paste support, GtkSource, line numbers, markdown syntax 
   highlighting, improves new and open process, horizontal layout, join and

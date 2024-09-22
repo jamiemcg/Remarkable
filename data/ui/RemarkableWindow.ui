@@ -919,7 +919,7 @@
                       </object>
                     </child>
                     <child>
-                      <object class="GtkMenuItem" id="markdown_tutorial">
+                      <object class="GtkMenuItem" id="menuitem_markdown_tutorial">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="label" translatable="yes">Markdown Tutorial</property>
