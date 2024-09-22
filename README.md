@@ -1,6 +1,6 @@
 # Remarkable
 
-### A Fully Featured Markdown Editor for Linux
+### A Fully Featured Markdown Editor for Linux  
 
 Remarkable is an open source Markdown Editor for Linux.
 You can download the latest version from the [project site](https://remarkableapp.github.io/linux.html).
@@ -28,6 +28,13 @@ Check out the [homepage](https://remarkableapp.github.io/linux.html) for more de
 ### Dependencies
 
 **!!!TODO!!!**
+|Aarch64|armhf|
+|--|--|
+|libicu57_57.1-6+deb9u4_arm64|--|
+|libjavascriptcoregtk-3.0-0_2.4.11-3_arm64|--|
+|libwebkitgtk-3.0-0_2.4.11-3_arm64|--|
+|gir1.2-javascriptcoregtk-3.0_2.4.11-3_arm64|--|
+|gir1.2-webkit-3.0_2.4.11-3_arm64|--|
 
 ### Keyboard Shortcuts
 
@@ -63,3 +70,7 @@ Check out the [homepage](https://remarkableapp.github.io/linux.html) for more de
 |Undo|Ctrl+Z|
 |Zoom In|Ctrl+Plus|
 |Zoom Out|Ctrl+Minus|
+
+
+
+[![badge](https://github.com/Botspot/pi-apps/blob/master/icons/badge.png?raw=true)](https://github.com/Botspot/pi-apps)  
