@@ -2,7 +2,7 @@
 Name=Remarkable
 Comment=A free, fully featured markdown editor for Linux.
 Categories=GNOME;Utility;
-Exec=/usr/bin/remarkable %f
-Icon=remarkable
+Exec=/opt/Remarkable/run.sh %f
+Icon=/opt/Remarkable/data/media/remarkable.png
 Terminal=false
 Type=Application
