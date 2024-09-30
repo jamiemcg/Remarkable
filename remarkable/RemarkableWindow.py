@@ -39,7 +39,7 @@ import traceback
 import styles
 import unicodedata
 import warnings
-from findBar import FindBar
+from remarkable.findBar import FindBar
 
 # Check if gtkspellcheck is installed
 try:
