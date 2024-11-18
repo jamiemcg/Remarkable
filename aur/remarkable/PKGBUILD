@@ -13,40 +13,52 @@ depends=('python'
          'python-markdown'
          'python-beautifulsoup4'
          'python-gtkspellcheck'
-         'webkitgtk'
+         'webkitgtk-6.0'
          'wkhtmltopdf')
-makedepends=('python')
 options=('!emptydirs' '!strip')
 install="${pkgname}.install"
-source=("http://remarkableapp.github.io/files/${pkgname}_${pkgver}_all.deb"
-        "${pkgname}.install")
-md5sums=('b14b7bf5b4d4cbf2acb9559220bba982'
+source=(
+  "${pkgname}-${pkgver}.tar.gz::https://github.com/jamiemcg/Remarkable/archive/refs/tags/v${pkgver}.tar.gz"
+  "${pkgname}.install"
+)
+md5sums=('206c28415fddc594cb6162cbe51cb793'
          '4230de2876e8789bcd5a7cdc84b2a30b')
 
 package() {
-    _python_site=$(python -c 'import site; print(site.getsitepackages()[0]);')
-    [ -z ${_python_site} ] && echo "error: could not identify python site_packages directory" && return 1
+    cd "$srcdir/${pkgname^}-${pkgver}"
 
-    msg2 "Extracting data.tar.gz..."
-    tar -Jxf data.tar.xz -C "${pkgdir}/"
+    # Install the main binary
+    install -Dm755 bin/remarkable "$pkgdir/usr/share/$pkgname/$pkgname.bin"
+    install -Dm755 /dev/stdin "$pkgdir/usr/bin/${pkgname}" << EOF
+#!/bin/bash
+export PYTHONPATH="/usr/share/${pkgname}:/usr/share/${pkgname}/${pkgname}:\$PYTHONPATH"
+exec /usr/share/${pkgname}/remarkable.bin "\$@"
+EOF
 
-    msg2 "Moving parts in place..."
+    # Install desktop entry
+    install -Dm644 ${pkgname}.desktop "$pkgdir/usr/share/applications/${pkgname}.desktop"
 
-    # python
-    install -d "${pkgdir}/${_python_site}"
-    mv  "${pkgdir}/usr/lib/python3/dist-packages/"* "${pkgdir}/${_python_site}/"
+    # Install icons
+    install -Dm644 data/media/remarkable.png "$pkgdir/usr/share/pixmaps/${pkgname}.png"
+    install -Dm644 data/media/remarkable.svg "$pkgdir/usr/share/icons/hicolor/scalable/apps/${pkgname}.svg"
 
-    # license
-    install -d "${pkgdir}/usr/share/licenses/${pkgname}/"
-    curl -Ls "${url}/license.txt" \
-         -o "${pkgdir}/usr/share/licenses/${pkgname}/license.txt"
+    # Install glib schema
+    install -Dm644 data/glib-2.0/schemas/net.launchpad.remarkable.gschema.xml \
+        "$pkgdir/usr/share/glib-2.0/schemas/net.launchpad.remarkable.gschema.xml"
 
-    msg2 "Fixing module include path..."
-    sed -i "s/import styles/from remarkable import styles/" \
-           "${pkgdir}/${_python_site}/remarkable/RemarkableWindow.py"
+    # Recursively copy all necessary directories and files
+    for dir in data remarkable remarkable_lib pdfkit; do
+        if [[ -d $dir ]]; then
+            cp -r "$dir" "$pkgdir/usr/share/${pkgname}/"
+        fi
+    done
 
-    msg2 "Removing unnecessities..."
-    rm -r "${pkgdir}/usr/lib/mime"
+    # Install additional scripts if present
+    [[ -f run.sh ]] && install -Dm755 run.sh "$pkgdir/usr/share/${pkgname}/run.sh"
+
+    # License and documentation
+    install -Dm644 LICENSE "$pkgdir/usr/share/licenses/${pkgname}/LICENSE"
+    install -Dm644 README.md "$pkgdir/usr/share/doc/${pkgname}/README.md"
 }
 
 # vim:set ts=4 sw=4 et:
