@@ -1654,21 +1654,40 @@ class RemarkableWindow(Window):
         self.status_message = "Lines: " + str(lines) + ", " + "Words: " + str(word_count) + ", Characters: " + str(chars)
         self.statusbar.push(self.context_id, self.status_message)
 
-    def update_live_preview(self, widet):
-        text = self.text_buffer.get_text(self.text_buffer.get_start_iter(), self.text_buffer.get_end_iter(), False)
+    def update_live_preview(self, widget):
+        text = self.text_buffer.get_text(
+            self.text_buffer.get_start_iter(),
+            self.text_buffer.get_end_iter(),
+            False
+        )
+
         try:
-            html_middle = markdown.markdown(text, extensions=self.default_extensions)
+            html_middle = markdown.markdown(
+                text,
+                extensions=self.default_extensions,
+                disable_raw_html=False
+            )
         except Exception as e:
             print(e)
             try:
-                html_middle = markdown.markdown(text, extensions=self.safe_extensions)
+                html_middle = markdown.markdown(
+                    text,
+                    extensions=self.safe_extensions,
+                    disable_raw_html=False
+                )
             except:
-                html_middle = markdown.markdown(text)
+                html_middle = markdown.markdown(
+                    text,
+                    disable_raw_html=False
+                )
+
         html = self.default_html_start + html_middle + self.default_html_end
 
         # Update the display, supporting relative paths to local images
-        self.live_preview.load_html(html, "file://{}".format(os.path.abspath(self.name)))
-
+        self.live_preview.load_html(
+            html,
+            "file://{}".format(os.path.abspath(self.name))
+        )
     """
         This function suppresses the messages from the WebKit (live preview) console
     """
