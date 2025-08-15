@@ -82,6 +82,12 @@ class RemarkableWindow(Window):
         self.default_extensions = ['markdown.extensions.extra','markdown.extensions.toc', 'markdown.extensions.smarty', 'markdown_extensions.extensions.urlize', 'markdown_extensions.extensions.Highlighting', 'markdown_extensions.extensions.Strikethrough', 'markdown_extensions.extensions.markdown_checklist', 'markdown_extensions.extensions.superscript', 'markdown_extensions.extensions.subscript', 'markdown_extensions.extensions.mathjax']
         self.safe_extensions = ['markdown.extensions.extra']
         self.pdf_error_warning = False
+        
+        # Recent files management
+        self.recent_files = []
+        self.max_recent_files = 10
+        self.recent_files_file = os.path.expanduser("~/.config/remarkable/recent_files.txt")
+        self.load_recent_files()
 
         self.window = self.builder.get_object("remarkable_window")
         self.window.connect("delete-event", self.window_delete_event)
@@ -154,6 +160,8 @@ class RemarkableWindow(Window):
                     text = temp.read()
                     self.text_buffer.set_text(text)
                     self.text_buffer.set_modified(False)
+                    # Add to recent files when opening from command line
+                    self.add_recent_file(sys.argv[1])
             except:
                 print(self.name + " does not exist, creating it")
 
@@ -164,6 +172,15 @@ class RemarkableWindow(Window):
         # _thread.start_new_thread(self.check_for_updates, ())
 
         self.text_view.grab_focus()
+        
+        # Initialize recent files menu
+        self.recent_files_menu = self.builder.get_object("recent_files_menu")
+        if hasattr(self, 'accel_group'):
+            pass  # accel_group will be set up if needed
+        else:
+            self.accel_group = Gtk.AccelGroup()
+            self.window.add_accel_group(self.accel_group)
+        self.update_recent_files_menu()
         
 
         self.tv_scrolled = self.scrolledwindow_text_view.get_vadjustment().connect("value-changed", self.scrollPreviewTo)
@@ -401,17 +418,7 @@ class RemarkableWindow(Window):
             
             if len(text) == 0 and not self.text_buffer.get_modified():
                 # Current file is empty. Load contents of selected file into this view
-                
-                self.text_buffer.begin_not_undoable_action()
-                file = open(selected_file, 'r')
-                text = file.read()
-                file.close()
-                self.name = chooser.get_filename()
-                self.text_buffer.set_text(text)
-                title = chooser.get_filename().split("/")[-1]
-                self.window.set_title("Remarkable: " + title)
-                self.text_buffer.set_modified(False)
-                self.text_buffer.end_not_undoable_action()
+                self.load_file(selected_file)
             else:
                 # A file is already open. Load the selected file in a new Remarkable process
                 subprocess.Popen([sys.argv[0], selected_file])
@@ -422,6 +429,24 @@ class RemarkableWindow(Window):
 
         chooser.destroy()
         self.window.set_sensitive(True)
+    
+    def load_file(self, file_path):
+        """Load a file into the editor"""
+        try:
+            self.text_buffer.begin_not_undoable_action()
+            with open(file_path, 'r') as file:
+                text = file.read()
+            self.name = file_path
+            self.text_buffer.set_text(text)
+            title = file_path.split("/")[-1]
+            self.window.set_title("Remarkable: " + title)
+            self.text_buffer.set_modified(False)
+            self.text_buffer.end_not_undoable_action()
+            # Add to recent files when loading
+            self.add_recent_file(file_path)
+        except Exception as e:
+            logger.error(f"Error loading file {file_path}: {e}")
+            print(f"Error loading file: {e}")
 
     def check_for_save(self, widget):
         reply = False
@@ -456,6 +481,8 @@ class RemarkableWindow(Window):
             title = self.name.split("/")[-1]
             self.text_buffer.set_modified(False)
             self.window.set_title("Remarkable: " + title)
+            # Add to recent files when saving
+            self.add_recent_file(self.name)
             return True
         else:
             return self.save_as(self)
@@ -484,6 +511,8 @@ class RemarkableWindow(Window):
             self.text_buffer.set_modified(False)
             title = self.name.split("/")[-1]
             self.window.set_title("Remarkable: " + title)
+            # Add to recent files when saving as
+            self.add_recent_file(self.name)
         else:
             saved = False # User cancelled saving after choosing to save. Need to cancel quit operation now
         chooser.destroy()
@@ -1648,3 +1677,122 @@ class RemarkableWindow(Window):
 
     def set_file_chooser_path(self, chooser):
         chooser.set_current_folder(os.path.dirname(self.name))
+
+    """
+        Recent files functionality
+    """
+    def load_recent_files(self):
+        """Load recent files from config file"""
+        try:
+            # Create config directory if it doesn't exist
+            config_dir = os.path.dirname(self.recent_files_file)
+            os.makedirs(config_dir, exist_ok=True)
+            
+            if os.path.exists(self.recent_files_file):
+                with open(self.recent_files_file, 'r') as f:
+                    self.recent_files = [line.strip() for line in f.readlines() if line.strip()]
+                # Remove files that no longer exist
+                self.recent_files = [f for f in self.recent_files if os.path.exists(f)]
+        except Exception as e:
+            logger.warning(f"Could not load recent files: {e}")
+            self.recent_files = []
+    
+    def save_recent_files(self):
+        """Save recent files to config file"""
+        try:
+            config_dir = os.path.dirname(self.recent_files_file)
+            os.makedirs(config_dir, exist_ok=True)
+            
+            with open(self.recent_files_file, 'w') as f:
+                for file_path in self.recent_files:
+                    f.write(file_path + '\n')
+        except Exception as e:
+            logger.warning(f"Could not save recent files: {e}")
+    
+    def add_recent_file(self, file_path):
+        """Add a file to the recent files list"""
+        # Convert to absolute path
+        file_path = os.path.abspath(file_path)
+        
+        # Remove if already in list
+        if file_path in self.recent_files:
+            self.recent_files.remove(file_path)
+        
+        # Add to beginning of list
+        self.recent_files.insert(0, file_path)
+        
+        # Limit list size
+        if len(self.recent_files) > self.max_recent_files:
+            self.recent_files = self.recent_files[:self.max_recent_files]
+        
+        # Save to file
+        self.save_recent_files()
+        
+        # Update menu
+        self.update_recent_files_menu()
+    
+    def clear_recent_files(self):
+        """Clear all recent files"""
+        self.recent_files = []
+        self.save_recent_files()
+        self.update_recent_files_menu()
+    
+    def open_recent_file(self, menuitem, file_path):
+        """Open a recent file"""
+        if os.path.exists(file_path):
+            self.load_file(file_path)
+        else:
+            # File no longer exists, remove from recent files
+            if file_path in self.recent_files:
+                self.recent_files.remove(file_path)
+                self.save_recent_files()
+                self.update_recent_files_menu()
+    
+    def update_recent_files_menu(self):
+        """Update the recent files submenu"""
+        if not hasattr(self, 'recent_files_menu'):
+            return
+            
+        # Clear existing menu items
+        for child in self.recent_files_menu.get_children():
+            self.recent_files_menu.remove(child)
+        
+        if not self.recent_files:
+            # Add "No recent files" item
+            no_files_item = Gtk.MenuItem.new_with_label("No recent files")
+            no_files_item.set_sensitive(False)
+            no_files_item.show()
+            self.recent_files_menu.append(no_files_item)
+        else:
+            # Add recent files
+            for i, file_path in enumerate(self.recent_files):
+                # Create menu item with filename and path
+                filename = os.path.basename(file_path)
+                directory = os.path.dirname(file_path)
+                
+                # Truncate long paths
+                if len(directory) > 50:
+                    directory = "..." + directory[-47:]
+                
+                label = f"{i+1}. {filename}"
+                menu_item = Gtk.MenuItem.new_with_label(label)
+                menu_item.set_tooltip_text(file_path)
+                menu_item.connect("activate", self.open_recent_file, file_path)
+                menu_item.show()
+                self.recent_files_menu.append(menu_item)
+                
+                # Add accelerator for first 9 files (Ctrl+1-9)
+                if i < 9:
+                    menu_item.add_accelerator("activate", self.accel_group, 
+                                            ord('1') + i, Gdk.ModifierType.CONTROL_MASK, 
+                                            Gtk.AccelFlags.VISIBLE)
+            
+            # Add separator and clear option
+            separator = Gtk.SeparatorMenuItem()
+            separator.show()
+            self.recent_files_menu.append(separator)
+            
+            clear_item = Gtk.MenuItem.new_with_label("Clear Recent Files")
+            clear_item.connect("activate", lambda x: self.clear_recent_files())
+            clear_item.show()
+            self.recent_files_menu.append(clear_item)
