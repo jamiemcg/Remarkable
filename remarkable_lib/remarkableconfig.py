@@ -55,10 +55,18 @@ def get_data_file(*path_segments):
 def get_data_path():
     """Retrieve remarkable data path
 
-    This path is by default <remarkable_lib_path>/../data/ in trunk
-    and /usr/share/remarkable in an installed version but this path
-    is specified at installation time.
+    Resolves the bundled ``data`` directory however Remarkable was installed:
+    as the ``remarkable.data`` package (pip/uv/wheel install), from a source
+    checkout (``../data``), or from a system prefix (``/usr/share/remarkable``).
     """
+
+    try:
+        from importlib.resources import files
+        package_data = str(files('remarkable.data'))
+        if os.path.exists(package_data):
+            return package_data
+    except (ImportError, ModuleNotFoundError, TypeError):
+        pass
 
     for data_dir in __remarkable_data_directories__:
         path = os.path.join(

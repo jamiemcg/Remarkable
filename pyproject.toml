@@ -1,0 +1,51 @@
+[build-system]
+build-backend = "setuptools.build_meta"
+requires = ["setuptools>=68"]
+
+[project]
+name = "remarkable"
+version = "1.95"
+description = "A fully featured Markdown editor for Linux (GTK 3)"
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.8"
+authors = [
+  { name = "Jamie McGowan", email = "jamiemcgowan.dev@gmail.com" },
+]
+
+# PyGObject and the GTK stack (GTK 3, GtkSourceView 3.0, WebKit2 4.1) are system
+# libraries, installed separately (distro packages or flake.nix), not from PyPI.
+dependencies = [
+  "markdown",
+  "beautifulsoup4",
+]
+
+[project.optional-dependencies]
+spell = ["pygtkspellcheck"]
+
+[project.scripts]
+remarkable = "remarkable:main"
+
+[tool.setuptools]
+packages = [
+  "remarkable",
+  "remarkable.data",
+  "remarkable.markdown",
+  "remarkable.markdown.extensions",
+  "remarkable_lib",
+  "pdfkit",
+]
+
+[tool.setuptools.package-data]
+"remarkable.data" = [
+  "glib-2.0/schemas/*",
+  "media/*",
+  "ui/*",
+]
+
+[tool.setuptools.package-dir]
+"remarkable" = "remarkable"
+"remarkable.data" = "data"
+
+[tool.uv]
+package = true

@@ -1,3 +1,19 @@
 __pycache__
 .idea
 .DS_Store
+
+# Python build artifacts
+*.egg-info/
+build/
+dist/
+
+# uv / virtualenv
+.venv/
+uv.lock
+
+# Nix lock
+flake.lock
+
+# Nix build output
+result
+result-*

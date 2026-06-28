@@ -27,7 +27,26 @@ Check out the [homepage](https://remarkableapp.github.io/linux.html) for more de
 
 ### Dependencies
 
-**!!!TODO!!!**
+Remarkable is a GTK 3 application: PyGObject and the GTK introspection stack are
+provided by your distribution's packages, not by PyPI.
+
+**Debian / Ubuntu**
+
+`python3-gi gir1.2-gtk-3.0 gir1.2-gtksource-3.0 gir1.2-webkit2-4.1 gir1.2-glib-2.0 python3-bs4 python3-markdown python3-gtkspellcheck wkhtmltopdf`
+
+**Fedora / RHEL**
+
+`python3-gobject gtk3 gtksourceview3 webkit2gtk4.1 python3-beautifulsoup4 python3-markdown wkhtmltopdf`
+
+With those installed, run it via uv. The virtualenv has to see the system GTK
+bindings, so create it once with system site-packages:
+
+```
+uv venv --system-site-packages
+uv run remarkable
+```
+
+On NixOS use the flake instead: `nix run`, or `nix develop` then `uv run remarkable`.
 
 ### Keyboard Shortcuts
 
